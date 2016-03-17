@@ -1,0 +1,17 @@
+{
+  "name": "@sb/prades",
+  "version": "0.0.9",
+  "description": "Tool to embed large binary objects in packages",
+  "main": "index.js",
+  "bin": {"prades": "./index.js"},
+  "dependencies": {
+    "fs": "*",
+    "url-template": "*",
+    "request": "*"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
