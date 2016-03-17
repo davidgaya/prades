@@ -12,11 +12,10 @@ log.info("running prades install!");
 var package_json = require('./lib/package')({logger: log});
 
 var get_location = function (res)  {
-    if(res.statusCode === 302) {
+    if(res.statusCode.toString().slice(0,1) === '3') {
         log.info({location: res.headers.location}, "redirected");
         return res.headers.location;
     } else {
-        log.error(res.body);
         throw(res.body);
     }
 };
@@ -42,7 +41,7 @@ var credentials = npm_credentials({
     logger: log
 });
 credentials.then(function (token) {
-    log.info("Downloading: ", package_json.file_name());
+    log.info("Downloading: " + package_json.file_name());
     return promisify(request)({
         baseUrl: package_json.host(),
         uri: package_json.file_name(),
