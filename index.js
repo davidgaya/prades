@@ -1,40 +1,59 @@
 #!/usr/bin/env node
 'use strict';
 
-var pack = require('./lib/package');
 var promisify = require('./lib/promisify');
 var request = require('request');
 var fs = require('fs');
 var path = require('path').posix;
+var bunyan = require('bunyan');
 
-console.log("running prades install!");
+var log = bunyan.createLogger({name: "myapp", level: 'debug'});
+log.info("running prades install!");
+var package_json = require('./lib/package')({logger: log});
 
 var get_location = function (res)  {
     if(res.statusCode === 302) {
+        log.info({location: res.headers.location}, "redirected");
         return res.headers.location;
     } else {
+        log.error(res.body);
         throw(res.body);
     }
 };
 
 var download_file = function (url) {
-    var file_path = path.join(pack.path(), path.basename(pack.file_name()));
+    log.info("downloading file " + url);
+    var file_path = path.join(package_json.path(), path.basename(package_json.file_name()));
     var file_stream = fs.createWriteStream(file_path);
-    request(url).pipe(file_stream);
+    request(url)
+        .on('response', (res) => {
+            if (res.statusCode.toString().slice(0,1) !== '2') {
+                var err = Error("File does not exist.");
+                log.error(err);
+                throw err;
+            }
+        })
+        .pipe(file_stream);
 };
 
-require('./lib/npm_credentials')(pack.host()).then(function (token) {
-    console.log("Downloading: ", pack.file_name());
-    promisify(request)({
-        baseUrl: pack.host(),
-        uri: pack.file_name(),
+var npm_credentials = require('./lib/npm_credentials');
+var credentials = npm_credentials({
+    host: package_json.host(),
+    logger: log
+});
+credentials.then(function (token) {
+    log.info("Downloading: ", package_json.file_name());
+    return promisify(request)({
+        baseUrl: package_json.host(),
+        uri: package_json.file_name(),
         followRedirect: false,
         auth: {
             bearer: token
         }
     })
     .then(get_location)
-    .then(download_file)
-    .catch(console.log);
+    .then(download_file);
 
+}).catch(function (reason) {
+    log.error(reason);
 });

@@ -1,13 +1,14 @@
 {
   "name": "@sb/prades",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "description": "Tool to embed large binary objects in packages",
   "main": "index.js",
   "bin": {"prades": "./index.js"},
   "dependencies": {
     "fs": "*",
     "url-template": "*",
-    "request": "*"
+    "request": "*",
+    "bunyan": "*"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
