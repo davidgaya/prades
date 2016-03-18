@@ -5,9 +5,8 @@ var promisify = require('./lib/promisify');
 var request = require('request');
 var fs = require('fs');
 var path = require('path').posix;
-var bunyan = require('bunyan');
+var log = require('npmlog');
 
-var log = bunyan.createLogger({name: "myapp", level: 'debug'});
 log.info("running prades publish!");
 var package_json = require('./lib/package')({logger: log});
 
@@ -19,7 +18,7 @@ var credentials = npm_credentials({
 
 var get_location = function (res)  {
     if(res.statusCode.toString().slice(0,1) === '3') {
-        log.info({location: res.headers.location}, "redirected");
+        log.info("redirected ", res.headers.location);
         return res.headers.location;
     } else {
         throw(res.body);
@@ -27,7 +26,7 @@ var get_location = function (res)  {
 };
 
 var upload_file = function (url) {
-    log.info("Uploading to " + url);
+    log.info("Uploading to ", url);
     var file_path = path.join(package_json.path(), path.basename(package_json.file_name()));
     var headers = {
         'content-type': 'application/octet-stream',
@@ -44,7 +43,7 @@ var upload_file = function (url) {
 };
 
 credentials.then(function (token) {
-    log.info("Uploading: " + package_json.file_name());
+    log.info("Uploading: ", package_json.file_name());
     return promisify(request)({
         baseUrl: package_json.host(),
         uri: package_json.file_name(),
