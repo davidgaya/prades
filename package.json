@@ -9,6 +9,7 @@
     "url-template": "*",
     "request": "*",
     "npmlog": "*",
+    "mkdirp": "*",
     "commander": "*"
   },
   "scripts": {

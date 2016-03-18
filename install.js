@@ -6,25 +6,22 @@ var request = require('request');
 var fs = require('fs');
 var path = require('path').posix;
 var log = require('npmlog');
+var get_location = require('./lib/get_location')(log);
+var mkdirp = require('mkdirp');
 
 log.info("running prades install!");
 var package_json = require('./lib/package')({logger: log});
 
-var get_location = function (res)  {
-    if(res.statusCode.toString().slice(0,1) === '3') {
-        log.info("redirected", res.headers.location);
-        return res.headers.location;
-    } else {
-        throw(res.body);
-    }
-};
-
 var download_file = function (url) {
-    log.info("downloading file", url);
+    log.http("GET", url);
+    mkdirp(package_json.path(), function (err) {
+        if (err) {log.error('mkdirp', "Cannot create " + package_json.path());}
+    });
     var file_path = path.join(package_json.path(), path.basename(package_json.file_name()));
     var file_stream = fs.createWriteStream(file_path);
     request(url)
         .on('response', (res) => {
+            log.http(res.statusCode)
             if (res.statusCode.toString().slice(0,1) !== '2') {
                 var err = Error("File does not exist.");
                 log.error(err);
