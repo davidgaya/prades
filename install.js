@@ -23,8 +23,8 @@ var download_file = function (url) {
         .on('response', (res) => {
             log.http(res.statusCode)
             if (res.statusCode.toString().slice(0,1) !== '2') {
-                var err = Error("File does not exist.");
-                log.error(err);
+                var err = Error("File does not exist. Ask developer to publish binaries for this version.");
+                log.error("ERROR", err);
                 throw err;
             }
         })
