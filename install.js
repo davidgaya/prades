@@ -6,49 +6,75 @@ var request = require('request');
 var fs = require('fs');
 var path = require('path').posix;
 var log = require('npmlog');
-var get_location = require('./lib/get_location')(log);
 var mkdirp = require('mkdirp');
+var unpack = require('tar-pack').unpack;
 
 log.info("running prades install!");
+var get_redirect_location = require('./lib/get_location')(log);
 var package_json = require('./lib/package')({logger: log});
-
-var download_file = function (url) {
-    log.http("GET", url);
-    mkdirp(package_json.path(), function (err) {
-        if (err) {log.error('mkdirp', "Cannot create " + package_json.path());}
-    });
-    var file_path = path.join(package_json.path(), path.basename(package_json.file_name()));
-    var file_stream = fs.createWriteStream(file_path);
-    request(url)
-        .on('response', (res) => {
-            log.http(res.statusCode)
-            if (res.statusCode.toString().slice(0,1) !== '2') {
-                var err = Error("File does not exist. Ask developer to publish binaries for this version.");
-                log.error("ERROR", err);
-                throw err;
-            }
-        })
-        .pipe(file_stream);
-};
-
 var npm_credentials = require('./lib/npm_credentials');
 var credentials = npm_credentials({
     host: package_json.host(),
     logger: log
 });
-credentials.then(function (token) {
-    log.info("Downloading: ", package_json.file_name());
-    return promisify(request)({
-        baseUrl: package_json.host(),
-        uri: package_json.file_name(),
-        followRedirect: false,
-        auth: {
-            bearer: token
-        }
-    })
-    .then(get_location)
-    .then(download_file);
 
-}).catch(function (reason) {
-    log.error(reason);
-});
+get_signed_source_url(package_json.host(), package_json.file_name())
+.then(get_stream)
+.then(extract_stream_to(package_json.path()))
+.catch(log.error);
+
+// returns a Promise of the signed url
+function get_signed_source_url(host, path) {
+
+    function request_get_to_registry(token) {
+        return promisify(request)({
+            baseUrl: host,
+            uri: path,
+            followRedirect: false,
+            auth: {
+                bearer: token
+            }
+        });
+    }
+
+    return credentials.then(function (token) {
+        return request_get_to_registry(token).then(get_redirect_location);
+    });
+}
+
+// takes a url
+// returns a Promise of the packed stream
+function get_stream(url) {
+    return new Promise(function (fulfill, reject) {
+        log.http("GET", url);
+        var r = request(url);
+        r.on('response', (res) => {
+            log.http(res.statusCode);
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+                fulfill(r);
+            } else {
+                var err = Error("File does not exist. Ask developer to publish binaries for this version.");
+                log.error("ERROR", err);
+                reject(err);
+            }
+        });
+        r.on('error', (err) => { reject(err); });
+    });
+}
+
+// takes a target_path
+// returns a function that
+//     takes a stream
+//     unpacks it
+function extract_stream_to(target_path) {
+    return function (packed_stream) {
+        packed_stream
+            .pipe(unpack(target_path, function (err) {
+                if (err) {
+                    log.error(err);
+                } else {
+                    log.info('UNPACK', 'done');
+                }
+            }));
+    };
+}

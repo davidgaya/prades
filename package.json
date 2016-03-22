@@ -1,16 +1,20 @@
 {
   "name": "@sb/prades",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Tool to embed large binary objects in packages",
   "main": "index.js",
-  "bin": {"prades": "./bin/cli.js"},
+  "bin": {
+    "prades": "./bin/cli.js"
+  },
   "dependencies": {
+    "commander": "*",
     "fs": "*",
-    "url-template": "*",
-    "request": "*",
-    "npmlog": "*",
     "mkdirp": "*",
-    "commander": "*"
+    "npmlog": "*",
+    "request": "*",
+    "temp": "*",
+    "tar-pack": "^3.1.3",
+    "url-template": "*"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
