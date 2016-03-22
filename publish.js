@@ -4,7 +4,6 @@
 var promisify = require('./lib/promisify');
 var request = require('request');
 var fs = require('fs');
-var path = require('path').posix;
 var log = require('npmlog');
 var temp = require('temp').track(); // Automatically track and cleanup files at exit
 var pack = require('tar-pack').pack;
@@ -22,13 +21,14 @@ Promise.all([
     get_signed_target_url(package_json.host(), package_json.file_name()),
     get_packed_file_path(package_json.path())
 ]).then(function (ary) {
+    // This is the ugly part of Promise.all, we get an array of fulfilled values
     var url = ary[0];
     var file_path = ary[1];
     put(url, file_path);
 }).catch(log.error);
 
 // takes host and path
-// returns a promise of the signed url
+// returns a Promise of the signed url
 function get_signed_target_url(host, path) {
 
     function request_put_to_registry(token) {
@@ -43,9 +43,7 @@ function get_signed_target_url(host, path) {
         });
     }
 
-    return credentials.then(function (token) {
-        return request_put_to_registry(token).then(get_redirect_location);
-    });
+    return credentials.then(request_put_to_registry).then(get_redirect_location);
 }
 
 // takes a path to pack
@@ -73,7 +71,8 @@ function put(url, file_path) {
         'content-type': 'application/octet-stream',
         'content-length': fs.statSync(file_path).size
     };
-    var r = request.put({uri: url, headers: headers}).on('response', function (res) {
+    var r = request.put({uri: url, headers: headers});
+    r.on('response', function (res) {
         if (res.statusCode.toString().slice(0, 1) === '2') {
             log.http(res.statusCode, 'Uploaded successfully.');
         } else {
@@ -81,5 +80,6 @@ function put(url, file_path) {
             throw("error uploading file");
         }
     });
+    r.on('error', (err) => {throw(err);});
     fs.createReadStream(file_path).pipe(r);
 }

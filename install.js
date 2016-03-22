@@ -3,10 +3,7 @@
 
 var promisify = require('./lib/promisify');
 var request = require('request');
-var fs = require('fs');
-var path = require('path').posix;
 var log = require('npmlog');
-var mkdirp = require('mkdirp');
 var unpack = require('tar-pack').unpack;
 
 log.info("running prades install!");
@@ -23,6 +20,7 @@ get_signed_source_url(package_json.host(), package_json.file_name())
 .then(extract_stream_to(package_json.path()))
 .catch(log.error);
 
+// takes host and path
 // returns a Promise of the signed url
 function get_signed_source_url(host, path) {
 
@@ -37,9 +35,7 @@ function get_signed_source_url(host, path) {
         });
     }
 
-    return credentials.then(function (token) {
-        return request_get_to_registry(token).then(get_redirect_location);
-    });
+    return credentials.then(request_get_to_registry).then(get_redirect_location);
 }
 
 // takes a url
@@ -75,6 +71,6 @@ function extract_stream_to(target_path) {
                 } else {
                     log.info('UNPACK', 'done');
                 }
-            }));
+            })).on('error', (err) => {log.error(err);});
     };
 }

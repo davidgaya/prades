@@ -9,7 +9,6 @@
   "dependencies": {
     "commander": "*",
     "fs": "*",
-    "mkdirp": "*",
     "npmlog": "*",
     "request": "*",
     "temp": "*",
