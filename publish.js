@@ -25,13 +25,14 @@ Promise.all([
     var url = ary[0];
     var file_path = ary[1];
     put(url, file_path);
-}).catch(log.error);
+}).catch((reason) => {log.error(reason);});
 
 // takes host and path
 // returns a Promise of the signed url
 function get_signed_target_url(host, path) {
 
     function request_put_to_registry(token) {
+        log.http('PUT', host + path);
         return promisify(request)({
             baseUrl: host,
             uri: path,
@@ -59,7 +60,7 @@ function get_packed_file_path(path_to_pack) {
                 reject(err);
             })
             .on('close', function () {
-                log.info('PACK', 'done');
+                log.info('PACK', 'done ('+ temp_file.path + ')');
                 fulfill(temp_file.path);
             });
     });
@@ -71,15 +72,15 @@ function put(url, file_path) {
         'content-type': 'application/octet-stream',
         'content-length': fs.statSync(file_path).size
     };
-    var r = request.put({uri: url, headers: headers});
-    r.on('response', function (res) {
-        if (res.statusCode.toString().slice(0, 1) === '2') {
+    var req = request.put({uri: url, headers: headers});
+    req.on('response', function (res) {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
             log.http(res.statusCode, 'Uploaded successfully.');
         } else {
             log.http(res.statusCode, res.body);
             throw("error uploading file");
         }
     });
-    r.on('error', (err) => {throw(err);});
-    fs.createReadStream(file_path).pipe(r);
+    req.on('error', (err) => {throw(err);});
+    fs.createReadStream(file_path).pipe(req);
 }

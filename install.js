@@ -25,6 +25,7 @@ get_signed_source_url(package_json.host(), package_json.file_name())
 function get_signed_source_url(host, path) {
 
     function request_get_to_registry(token) {
+        log.http('GET', host + path);
         return promisify(request)({
             baseUrl: host,
             uri: path,
