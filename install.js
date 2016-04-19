@@ -10,25 +10,28 @@ log.info("running prades install!");
 var get_redirect_location = require('./lib/get_location')(log);
 var package_json = require('./lib/package')({logger: log});
 var npm_credentials = require('./lib/npm_credentials');
-var credentials = npm_credentials({
-    host: package_json.host(),
-    logger: log
-});
 
-get_signed_source_url(package_json.host(), package_json.file_name())
-.then(get_stream)
-.then(extract_stream_to(package_json.path()))
-.catch(log.error);
+package_json.then(function (config) {
+    return get_signed_source_url(config)
+        .then(get_stream)
+        .then(extract_stream_to(config.path()));
+}).catch(log.error);
 
 // takes host and path
 // returns a Promise of the signed url
-function get_signed_source_url(host, path) {
+function get_signed_source_url(config) {
+    var credentials = npm_credentials({
+        host: config.host(),
+        logger: log
+    });
+    var host = config.host();
+    var file_name = config.file_name();
 
     function request_get_to_registry(token) {
-        log.http('GET', host + path);
+        log.http('GET', host + file_name);
         return promisify(request)({
             baseUrl: host,
-            uri: path,
+            uri: file_name,
             followRedirect: false,
             auth: {
                 bearer: token

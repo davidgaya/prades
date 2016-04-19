@@ -12,30 +12,34 @@ log.info("running prades publish!");
 var get_redirect_location = require('./lib/get_location')(log);
 var package_json = require('./lib/package')({logger: log});
 var npm_credentials = require('./lib/npm_credentials');
-var credentials = npm_credentials({
-    host: package_json.host(),
-    logger: log
-});
 
-Promise.all([
-    get_signed_target_url(package_json.host(), package_json.file_name()),
-    get_packed_file_path(package_json.path())
-]).then(function (ary) {
-    // This is the ugly part of Promise.all, we get an array of fulfilled values
-    var url = ary[0];
-    var file_path = ary[1];
-    put(url, file_path);
+package_json.then(function (config) {
+    Promise.all([
+        get_signed_target_url(config),
+        get_packed_file_path(config.path())
+    ]).then(function (ary) {
+        // This is the ugly part of Promise.all, we get an array of fulfilled values
+        var url = ary[0];
+        var file_path = ary[1];
+        put(url, file_path);
+    });
 }).catch((reason) => {log.error(reason);});
 
 // takes host and path
 // returns a Promise of the signed url
-function get_signed_target_url(host, path) {
+function get_signed_target_url(config) {
+    var credentials = npm_credentials({
+        host: config.host(),
+        logger: log
+    });
+    var host = config.host();
+    var file_name = config.file_name();
 
     function request_put_to_registry(token) {
-        log.http('PUT', host + path);
+        log.http('PUT', host + file_name);
         return promisify(request)({
             baseUrl: host,
-            uri: path,
+            uri: file_name,
             method: 'PUT',
             followRedirect: false,
             auth: {
