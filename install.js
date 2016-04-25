@@ -14,7 +14,7 @@ var npm_credentials = require('./lib/npm_credentials');
 package_json.then(function (config) {
     return get_signed_source_url(config)
         .then(get_stream)
-        .then(extract_stream_to(config.path()));
+        .then(extract_stream);
 }).catch(log.error);
 
 // takes host and path
@@ -62,19 +62,13 @@ function get_stream(url) {
     });
 }
 
-// takes a target_path
-// returns a function that
-//     takes a stream
-//     unpacks it
-function extract_stream_to(target_path) {
-    return function (packed_stream) {
-        packed_stream
-            .pipe(unpack(target_path, function (err) {
-                if (err) {
-                    log.error(err);
-                } else {
-                    log.info('UNPACK', 'done');
-                }
-            })).on('error', (err) => {log.error(err);});
-    };
+function extract_stream(packed_stream) {
+    packed_stream
+        .pipe(unpack('.', {keepFiles: true}, function (err) {
+            if (err) {
+                log.error(err);
+            } else {
+                log.info('UNPACK', 'done');
+            }
+        })).on('error', (err) => {log.error(err);});
 }

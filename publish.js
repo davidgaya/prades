@@ -53,11 +53,22 @@ function get_signed_target_url(config) {
 
 // takes a path to pack
 // returns a Promise of the packed file
-function get_packed_file_path(path_to_pack) {
+function get_packed_file_path(paths_to_pack) {
+    if (paths_to_pack.constructor !== Array) {
+        paths_to_pack = [paths_to_pack];
+    }
     var temp_file = temp.createWriteStream();
-
+    var first = true;
+    var filter = function (entry) {
+        if (first) {
+            first = false;
+            return true;
+        }
+        var it_matches = paths_to_pack.reduce((y, expr) => y || RegExp(expr).test(entry.path), false);
+        return it_matches;
+    };
     return new Promise(function (fulfill, reject) {
-        pack(path_to_pack)
+        pack('.', {filter: filter, ignoreFiles: 'no_ignore_file'})
             .pipe(temp_file)
             .on('error', function (err) {
                 log.error(err.stack);
