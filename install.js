@@ -10,12 +10,7 @@ log.info("running prades install!");
 var get_redirect_location = require('./lib/get_location')(log);
 var package_json = require('./lib/package')({logger: log});
 var npm_credentials = require('./lib/npm_credentials');
-
-package_json.then(function (config) {
-    return get_signed_source_url(config)
-        .then(get_stream)
-        .then(extract_stream);
-}).catch(log.error);
+var options;
 
 // takes host and path
 // returns a Promise of the signed url
@@ -72,3 +67,14 @@ function extract_stream(packed_stream) {
             }
         })).on('error', (err) => {log.error(err);});
 }
+
+module.exports = function (opt) {
+    options = opt;
+
+    package_json.then(function (config) {
+        return get_signed_source_url(config)
+            .then(get_stream)
+            .then(extract_stream);
+    }).catch(log.error);
+
+};

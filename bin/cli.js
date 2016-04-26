@@ -10,19 +10,21 @@ program
 program
     .command('install')
     .description('download and install binaries')
+    .option('-v, --verbose', 'Be verbose')
     .action(install);
 
 program
     .command('publish')
     .description('zip and upload binaries')
+    .option('-v, --verbose', 'Be verbose')
     .action(publish);
 
 program.parse(process.argv);
 
 function install(options) {
-    return require('../install');
+    return require('../install')(options);
 }
 
 function publish(options) {
-    return require('../publish');
+    return require('../publish')(options);
 }

@@ -7,23 +7,23 @@ var fs = require('fs');
 var log = require('npmlog');
 var temp = require('temp').track(); // Automatically track and cleanup files at exit
 var pack = require('tar-pack').pack;
+var grunt = require('grunt');
 
 log.info("running prades publish!");
 var get_redirect_location = require('./lib/get_location')(log);
 var package_json = require('./lib/package')({logger: log});
 var npm_credentials = require('./lib/npm_credentials');
+var options;
 
-package_json.then(function (config) {
-    Promise.all([
-        get_signed_target_url(config),
-        get_packed_file_path(config.path())
-    ]).then(function (ary) {
-        // This is the ugly part of Promise.all, we get an array of fulfilled values
-        var url = ary[0];
-        var file_path = ary[1];
-        put(url, file_path);
-    });
-}).catch((reason) => {log.error(reason);});
+var preexpand = function preexpand(p) {
+    var path = require('path');
+    var uniq = (arrArg) => {return arrArg.filter((elem, pos, arr) => {return arr.indexOf(elem) == pos;});}
+    var v = p.map(x=> path.dirname(x)).filter(x=> x!=='.');
+    if (v.length > 0) {
+        v = v.concat(preexpand(v));
+    }
+    return uniq(p.concat(v));
+}
 
 // takes host and path
 // returns a Promise of the signed url
@@ -59,12 +59,17 @@ function get_packed_file_path(paths_to_pack) {
     }
     var temp_file = temp.createWriteStream();
     var first = true;
+    var expanded = preexpand(grunt.file.expand(paths_to_pack));
     var filter = function (entry) {
+        var relative_path = entry.path.replace(process.cwd(), '').slice(1);
         if (first) {
             first = false;
             return true;
         }
-        var it_matches = paths_to_pack.reduce((y, expr) => y || RegExp(expr).test(entry.path), false);
+        var it_matches = paths_to_pack.reduce((y, expr) => y || grunt.file.isMatch(expanded, relative_path), false);
+        if (options.verbose) {
+            log.info(it_matches ? 'match: ': 'ignore:', relative_path);
+        }
         return it_matches;
     };
     return new Promise(function (fulfill, reject) {
@@ -99,3 +104,18 @@ function put(url, file_path) {
     req.on('error', (err) => {throw(err);});
     fs.createReadStream(file_path).pipe(req);
 }
+
+module.exports = function (opt) {
+    options = opt || {};
+    package_json.then(function (config) {
+        Promise.all([
+            get_signed_target_url(config),
+            get_packed_file_path(config.path())
+        ]).then(function (ary) {
+            // This is the ugly part of Promise.all, we get an array of fulfilled values
+            var url = ary[0];
+            var file_path = ary[1];
+            put(url, file_path);
+        });
+    }).catch((reason) => {log.error(reason);});
+};
