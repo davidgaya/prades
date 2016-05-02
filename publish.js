@@ -8,6 +8,7 @@ var log = require('npmlog');
 var temp = require('temp').track(); // Automatically track and cleanup files at exit
 var pack = require('tar-pack').pack;
 var grunt = require('grunt');
+var ncp = require('ncp').ncp;
 
 log.info("running prades publish!");
 var get_redirect_location = require('./lib/get_location')(log);
@@ -54,14 +55,12 @@ function get_signed_target_url(config) {
 // takes a path to pack
 // returns a Promise of the packed file
 function get_packed_file_path(paths_to_pack) {
-    if (paths_to_pack.constructor !== Array) {
-        paths_to_pack = [paths_to_pack];
-    }
     var temp_file = temp.createWriteStream();
+    var temp_dir = temp.mkdirSync('prades_packer');
     var first = true;
     var expanded = preexpand(grunt.file.expand(paths_to_pack));
     var filter = function (entry) {
-        var relative_path = entry.path.replace(process.cwd(), '').slice(1);
+        var relative_path = entry.path.replace(temp_dir.toString(), '').slice(1);
         if (first) {
             first = false;
             return true;
@@ -73,16 +72,21 @@ function get_packed_file_path(paths_to_pack) {
         return it_matches;
     };
     return new Promise(function (fulfill, reject) {
-        pack('.', {filter: filter, ignoreFiles: 'no_ignore_file'})
-            .pipe(temp_file)
-            .on('error', function (err) {
-                log.error(err.stack);
+        ncp(process.cwd(), temp_dir, {dereference: true}, function (err) {
+            if (err) {
                 reject(err);
-            })
-            .on('close', function () {
-                log.info('PACK', 'done ('+ temp_file.path + ')');
-                fulfill(temp_file.path);
-            });
+            }
+            pack(temp_dir, {filter: filter, ignoreFiles: 'no_ignore_file'})
+                .pipe(temp_file)
+                .on('error', function (err) {
+                    log.error(err.stack);
+                    reject(err);
+                })
+                .on('close', function () {
+                    log.info('PACK', 'done ('+ temp_file.path + ')');
+                    fulfill(temp_file.path);
+                });
+        });
     });
 }
 
