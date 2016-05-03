@@ -5,7 +5,8 @@ var program = require('commander');
 var version = require('../package.json').version;
 
 program
-    .version(version);
+    .version(version)
+    .description("Prades is a tool to embed large binary objects in npm packages, it works using S3 as store and a signing microservice in the npm registry.");
 
 program
     .command('install')
@@ -27,4 +28,9 @@ function install(options) {
 
 function publish(options) {
     return require('../publish')(options);
+}
+
+if (!program.args.length) {
+    console.log('v', program.version());
+    program.help();
 }
