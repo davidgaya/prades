@@ -58,25 +58,29 @@ function get_packed_file_path(paths_to_pack) {
     var temp_file = temp.createWriteStream();
     var temp_dir = temp.mkdirSync('prades_packer');
     var first = true;
-    var expanded = preexpand(grunt.file.expand(paths_to_pack));
-    var filter = function (entry) {
-        var relative_path = entry.path.replace(temp_dir.toString(), '').slice(1);
-        if (first) {
-            first = false;
-            return true;
-        }
-        var it_matches = paths_to_pack.reduce((y, expr) => y || grunt.file.isMatch(expanded, relative_path), false);
-        if (options.verbose) {
-            log.info(it_matches ? 'match: ': 'ignore:', relative_path);
-        }
-        return it_matches;
+
+    var getFilter = function () {
+        grunt.file.setBase(temp_dir);
+        var expanded = preexpand(grunt.file.expand(paths_to_pack));
+        return function (entry) {
+            var relative_path = entry.path.replace(temp_dir.toString(), '').slice(1);
+            if (first) {
+                first = false;
+                return true;
+            }
+            var it_matches = paths_to_pack.reduce((y, expr) => y || grunt.file.isMatch(expanded, relative_path), false);
+            if (options.verbose) {
+                log.info(it_matches ? 'match: ': 'ignore:', relative_path);
+            }
+            return it_matches;
+        };
     };
     return new Promise(function (fulfill, reject) {
         ncp(process.cwd(), temp_dir, {dereference: true}, function (err) {
             if (err) {
                 reject(err);
             }
-            pack(temp_dir, {filter: filter, ignoreFiles: 'no_ignore_file'})
+            pack(temp_dir, {filter: getFilter(), ignoreFiles: 'no_ignore_file'})
                 .pipe(temp_file)
                 .on('error', function (err) {
                     log.error(err.stack);
