@@ -1,6 +1,6 @@
 {
   "name": "@sb/prades",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Tool to embed large binary objects in packages",
   "main": "index.js",
   "bin": {
