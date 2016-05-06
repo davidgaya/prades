@@ -16,16 +16,6 @@ var package_json = require('./lib/package')({logger: log});
 var npm_credentials = require('./lib/npm_credentials');
 var options;
 
-var preexpand = function preexpand(p) {
-    var path = require('path');
-    var uniq = (arrArg) => {return arrArg.filter((elem, pos, arr) => {return arr.indexOf(elem) == pos;});}
-    var v = p.map(x=> path.dirname(x)).filter(x=> x!=='.');
-    if (v.length > 0) {
-        v = v.concat(preexpand(v));
-    }
-    return uniq(p.concat(v));
-}
-
 // takes host and path
 // returns a Promise of the signed url
 function get_signed_target_url(config) {
@@ -61,14 +51,14 @@ function get_packed_file_path(paths_to_pack) {
 
     var getFilter = function () {
         grunt.file.setBase(temp_dir);
-        var expanded = preexpand(grunt.file.expand(paths_to_pack));
+        var expanded = grunt.file.expand(paths_to_pack);
         return function (entry) {
             var relative_path = entry.path.replace(temp_dir.toString(), '').slice(1);
             if (first) {
                 first = false;
                 return true;
             }
-            var it_matches = paths_to_pack.reduce((y, expr) => y || grunt.file.isMatch(expanded, relative_path), false);
+            var it_matches = expanded.indexOf(relative_path) !== -1;
             if (options.verbose) {
                 log.info(it_matches ? 'match: ': 'ignore:', relative_path);
             }
@@ -76,10 +66,13 @@ function get_packed_file_path(paths_to_pack) {
         };
     };
     return new Promise(function (fulfill, reject) {
+        var time1 = new Date();
         ncp(process.cwd(), temp_dir, {dereference: true}, function (err) {
             if (err) {
                 reject(err);
             }
+            var time2 = new Date();
+            log.info('COPY', 'done ('+ temp_dir + ') took ' + ((time2 - time1)/1000) + "seconds");
             pack(temp_dir, {filter: getFilter(), ignoreFiles: 'no_ignore_file'})
                 .pipe(temp_file)
                 .on('error', function (err) {
@@ -87,7 +80,8 @@ function get_packed_file_path(paths_to_pack) {
                     reject(err);
                 })
                 .on('close', function () {
-                    log.info('PACK', 'done ('+ temp_file.path + ')');
+                    var time3 = new Date();
+                    log.info('PACK', 'done ('+ temp_file.path + ') took ' + ((time3 - time2)/1000) + "seconds");
                     fulfill(temp_file.path);
                 });
         });
@@ -95,6 +89,7 @@ function get_packed_file_path(paths_to_pack) {
 }
 
 function put(url, file_path) {
+    var time1 = new Date();
     log.http("PUT", url);
     var headers = {
         'content-type': 'application/octet-stream',
@@ -103,7 +98,8 @@ function put(url, file_path) {
     var req = request.put({uri: url, headers: headers});
     req.on('response', function (res) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-            log.http(res.statusCode, 'Uploaded successfully.');
+            var time2 = new Date();
+            log.http(res.statusCode, 'Uploaded successfully. took ' + ((time2 - time1)/1000) + "seconds");
         } else {
             log.http(res.statusCode, res.body);
             throw("error uploading file");
