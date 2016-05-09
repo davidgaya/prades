@@ -5,7 +5,7 @@ var promisify = require('./lib/promisify');
 var request = require('request');
 var fs = require('fs');
 var log = require('npmlog');
-var temp = require('temp').track(); // Automatically track and cleanup files at exit
+var temp = require('temp');
 var pack = require('tar-pack').pack;
 var grunt = require('grunt');
 var ncp = require('ncp').ncp;
@@ -111,8 +111,11 @@ function put(url, file_path) {
 
 module.exports = function (opt) {
     options = opt || {};
+    if (!options.debug) {
+        temp.track();
+    }
     package_json.then(function (config) {
-        Promise.all([
+        return Promise.all([
             get_signed_target_url(config),
             get_packed_file_path(config.path())
         ]).then(function (ary) {

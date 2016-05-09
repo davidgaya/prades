@@ -18,6 +18,7 @@ program
     .command('publish')
     .description('zip and upload binaries')
     .option('-v, --verbose', 'Be verbose')
+    .option('-d, --debug', 'Debug')
     .action(publish);
 
 program.parse(process.argv);
