@@ -4,14 +4,17 @@
   "description": "This is a test package for prades.",
   "main": "index.js",
   "dependencies": {
-    "@sb/prades": "^0.1.13"
+    "@sb/prades": "file:../.."
   },
   "binary": {
     "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
     "path": [
-      "boost/**",
+      "boost",
+      "boost/linked_dir/**",
+      "boost/linked_file.txt",
       "extra_readme.md",
-      "!boost/dont_pack.this"
+      "boost/boost/**",
+      "boost/stage/**"
     ],
     "host": "https://registry-node.starbreeze.com/-/releases"
   },

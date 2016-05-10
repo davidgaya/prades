@@ -1,21 +1,46 @@
 'use strict';
 
-var exec = require('child_process').exec;
+// f => g
+var promisify = function (f) {
+    var g = function () {
+        var args = Array.prototype.slice.call(arguments);
+        return new Promise(function (fulfill, reject) {
+            var callback = function (err) {
+                if (err) {return reject(err);}
+                var args2 = Array.prototype.slice.call(arguments, 1);
+                fulfill.apply(undefined, args2);
+            };
+            args.push(callback);
+            f.apply(undefined, args);
+        });
+    };
+    return g;
+};
+
+var exec = promisify(require('child_process').exec);
 var assert = require('assert');
 var fs = require('fs');
 
-exec("cd test/publish; prades publish -v", function (error, stdout, stderr) {
-    if (error !== null) {
-        console.log('publish error: ' + error);
-    } else {
-        exec("cd test/install; rm -R boost/ extra_readme.md; prades install", function puts(error, stdout, stderr) {
-            if (error !== null) {
-                console.log('install error: ' + error);
-            } else {
-                assert_result();
-            }
-        });
-    }
+describe("publish and install", function () {
+    this.timeout(5000);
+
+    before(function (done) {
+        exec("rm -Rf boost/ extra_readme.md", {cwd: 'test/install'}).then(done, done);
+    });
+
+    it("first example", function (done) {
+        exec("prades publish -v", {cwd: 'test/publish'}).then(function () {
+            return exec("rm -R boost/ extra_readme.md; prades install", {cwd: 'test/install'});
+        }).then(assert_result).then(done, done);
+
+    });
+
+    it("second example", function (done) {
+        exec("prades publish -vd", {cwd: 'test/publish2'}).then(function () {
+            return exec("rm -R boost/ extra_readme.md; prades install", {cwd: 'test/install'});
+        }).then(assert_result).then(done, done);
+    });
+
 });
 
 function assert_result() {
@@ -30,7 +55,6 @@ function assert_result() {
     assert_exists("./test/install/boost/stage/david_test.txt");
     assert_exists("./test/install/boost/linked_dir/linked_file.txt");
     assert_not_exists("./test/install/boost/dont_pack.this");
-    console.log('ok');
 }
 
 function assert_exists(path) {
