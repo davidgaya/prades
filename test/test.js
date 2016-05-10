@@ -1,22 +1,7 @@
 'use strict';
 
 // f => g
-var promisify = function (f) {
-    var g = function () {
-        var args = Array.prototype.slice.call(arguments);
-        return new Promise(function (fulfill, reject) {
-            var callback = function (err) {
-                if (err) {return reject(err);}
-                var args2 = Array.prototype.slice.call(arguments, 1);
-                fulfill.apply(undefined, args2);
-            };
-            args.push(callback);
-            f.apply(undefined, args);
-        });
-    };
-    return g;
-};
-
+var promisify = require('../lib/promisify');
 var exec = promisify(require('child_process').exec);
 var assert = require('assert');
 var fs = require('fs');
