@@ -1,6 +1,5 @@
 'use strict';
 
-// f => g
 var promisify = require('../lib/promisify');
 var exec = promisify(require('child_process').exec);
 var assert = require('assert');
@@ -15,14 +14,13 @@ describe("publish and install", function () {
 
     it("first example", function (done) {
         exec("prades publish -v", {cwd: 'test/publish'}).then(function () {
-            return exec("rm -R boost/ extra_readme.md; prades install", {cwd: 'test/install'});
+            return exec("prades install", {cwd: 'test/install'});
         }).then(assert_result).then(done, done);
-
     });
 
     it("second example", function (done) {
-        exec("prades publish -vd", {cwd: 'test/publish2'}).then(function () {
-            return exec("rm -R boost/ extra_readme.md; prades install", {cwd: 'test/install'});
+        exec("prades publish -v", {cwd: 'test/publish2'}).then(function () {
+            return exec("prades install", {cwd: 'test/install'});
         }).then(assert_result).then(done, done);
     });
 
