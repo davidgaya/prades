@@ -13,6 +13,10 @@ describe("publish and install", function () {
         clean_install_dir().then(done, done);
     });
 
+    after(function (done) {
+        clean_install_dir().then(done,done);
+    });
+
     it("first example", function (done) {
         var packageJson = {
             "name": "@sb/prades_test_1",

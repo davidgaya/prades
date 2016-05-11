@@ -1,27 +1,14 @@
 {
   "name": "@sb/prades_test_1",
   "version": "0.0.01",
-  "description": "This is a test package for prades.",
-  "main": "index.js",
   "dependencies": {
-    "@sb/prades": "^0.1.13"
+    "@sb/prades": "file:../.."
   },
   "binary": {
     "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
     "path": [
-      "boost/**",
-      "extra_readme.md",
-      "!boost/dont_pack.this"
+      "it doesn't matter what we have here, because we only use this package.json to install"
     ],
     "host": "https://registry-node.starbreeze.com/-/releases"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "prades install"
-  },
-  "author": "David Gaya",
-  "license": "ISC",
-  "bundleDependencies": [
-    "@sb/prades"
-  ]
+  }
 }
