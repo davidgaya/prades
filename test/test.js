@@ -6,6 +6,28 @@ var assert = require('assert');
 var fs = require('fs');
 var writeFile = promisify(fs.writeFile);
 
+/* this are the fs fixtures
+ ├── install
+ │   └── package.json
+ ├── linked_lib
+ │   ├── linked_dir
+ │   │   └── linked_file.txt
+ │   └── linked_file.txt
+ └── publish
+     ├── boost
+     │   ├── boost
+     │   │   └── david_test_2.txt
+     │   ├── dont_pack.this
+     │   ├── linked_dir -> ../../linked_lib/linked_dir
+     │   ├── linked_file.txt -> ../../linked_lib/linked_file.txt
+     │   └── stage
+     │       └── david_test.txt
+     ├── extra_readme.md
+     ├── index.js
+     ├── package.json
+     └── Readme.md
+*/
+
 describe("publish and install", function () {
     this.timeout(7000);
 
