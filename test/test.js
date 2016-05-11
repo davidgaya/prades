@@ -187,7 +187,10 @@ describe("publish and install", function () {
 });
 
 function clean_install_dir() {
-    return exec("rm -Rf boost/ extra_readme.md", {cwd: 'test/install'});
+    var rimraf = promisify(require('rimraf'));
+    return rimraf("test/install/boost").then(function () {
+       return rimraf("test/install/extra_readme.md");
+    });
 }
 
 function writePackageJson(conf) {
@@ -195,11 +198,11 @@ function writePackageJson(conf) {
 }
 
 function publish() {
-    return exec("../../bin/cli.js publish", {cwd: 'test/publish'});
+    return exec("node ../../bin/cli.js publish", {cwd: 'test/publish'});
 }
 
 function install() {
-    return exec("../../bin/cli.js install", {cwd: 'test/install'});
+    return exec("node ../../bin/cli.js install", {cwd: 'test/install'});
 }
 
 function assert_exists(path) {
