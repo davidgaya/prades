@@ -54,7 +54,8 @@ describe("publish and install", function () {
                     "!boost/dont_pack.this"
                 ],
                 "host": "https://registry-node.starbreeze.com/-/releases"
-            }
+            },
+            "license": "ISC", repository: '.'
         };
         writePackageJson(packageJson)
         .then(publish)
@@ -77,24 +78,25 @@ describe("publish and install", function () {
 
     it("second example", function (done) {
         var packageJson = {
-                "name": "@sb/prades_test_1",
-                "version": "0.0.01",
-                "dependencies": {
-                    "@sb/prades": "file:../.."
-                },
-                "binary": {
-                    "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
-                    "path": [
-                        "boost",
-                        "boost/linked_file.txt",
-                        "boost/linked_dir/**",
-                        "extra_readme.md",
-                        "boost/boost/**",
-                        "boost/stage/**"
-                    ],
-                    "host": "https://registry-node.starbreeze.com/-/releases"
-                }
-            };
+            "name": "@sb/prades_test_1",
+            "version": "0.0.01",
+            "dependencies": {
+                "@sb/prades": "file:../.."
+            },
+            "binary": {
+                "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
+                "path": [
+                    "boost",
+                    "boost/linked_file.txt",
+                    "boost/linked_dir/**",
+                    "extra_readme.md",
+                    "boost/boost/**",
+                    "boost/stage/**"
+                ],
+                "host": "https://registry-node.starbreeze.com/-/releases"
+            },
+            "license": "ISC", repository: '.'
+        };
         writePackageJson(packageJson)
         .then(publish)
         .then(install)
@@ -116,21 +118,22 @@ describe("publish and install", function () {
 
     it("third example", function (done) {
         var packageJson = {
-                "name": "@sb/prades_test_1",
-                "version": "0.0.01",
-                "dependencies": {
-                    "@sb/prades": "file:../.."
-                },
-                "binary": {
-                    "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
-                    "path": [
-                        "boost",
-                        "boost/boost/**",
-                        "boost/stage/**"
-                    ],
-                    "host": "https://registry-node.starbreeze.com/-/releases"
-                }
-            };
+            "name": "@sb/prades_test_1",
+            "version": "0.0.01",
+            "dependencies": {
+                "@sb/prades": "file:../.."
+            },
+            "binary": {
+                "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
+                "path": [
+                    "boost",
+                    "boost/boost/**",
+                    "boost/stage/**"
+                ],
+                "host": "https://registry-node.starbreeze.com/-/releases"
+            },
+            "license": "ISC", repository: '.'
+        };
         writePackageJson(packageJson)
         .then(publish)
         .then(install)
@@ -152,19 +155,20 @@ describe("publish and install", function () {
 
     it("fourth example", function (done) {
         var packageJson = {
-                "name": "@sb/prades_test_1",
-                "version": "0.0.01",
-                "dependencies": {
-                    "@sb/prades": "file:../.."
-                },
-                "binary": {
-                    "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
-                    "path": [
-                        "boost/**"
-                    ],
-                    "host": "https://registry-node.starbreeze.com/-/releases"
-                }
-            };
+            "name": "@sb/prades_test_1",
+            "version": "0.0.01",
+            "dependencies": {
+                "@sb/prades": "file:../.."
+            },
+            "binary": {
+                "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
+                "path": [
+                    "boost/**"
+                ],
+                "host": "https://registry-node.starbreeze.com/-/releases"
+            },
+            "license": "ISC", repository: '.'
+        };
         writePackageJson(packageJson)
         .then(publish)
         .then(install)
