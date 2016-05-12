@@ -198,7 +198,7 @@ function writePackageJson(conf) {
 }
 
 function publish() {
-    return exec("node ../../bin/cli.js publish", {cwd: 'test/publish'});
+    return exec("node ../../bin/cli.js publish -d", {cwd: 'test/publish'});
 }
 
 function install() {
