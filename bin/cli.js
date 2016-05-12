@@ -24,11 +24,11 @@ program
 program.parse(process.argv);
 
 function install(options) {
-    return require('../install')(options);
+    return require('../install')(options).catch(() => process.exit(1));
 }
 
 function publish(options) {
-    return require('../publish')(options);
+    return require('../publish')(options).catch(() => process.exit(1));
 }
 
 if (!program.args.length) {

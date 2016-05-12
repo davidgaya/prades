@@ -71,10 +71,13 @@ function extract_stream(packed_stream) {
 module.exports = function (opt) {
     options = opt;
 
-    package_json.then(function (config) {
+    return package_json.then(function (config) {
         return get_signed_source_url(config)
             .then(get_stream)
             .then(extract_stream);
-    }).catch(log.error);
+    }).catch((reason) => {
+        log.error(reason);
+        throw(Error(reason));
+    });
 
 };

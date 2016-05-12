@@ -114,7 +114,7 @@ module.exports = function (opt) {
     if (!options.debug) {
         temp.track();
     }
-    package_json.then(function (config) {
+    return package_json.then(function (config) {
         return Promise.all([
             get_signed_target_url(config),
             get_packed_file_path(config.path())
@@ -124,5 +124,8 @@ module.exports = function (opt) {
             var file_path = ary[1];
             put(url, file_path);
         });
-    }).catch((reason) => {log.error(reason);});
+    }).catch((reason) => {
+        log.error(reason);
+        throw(Error(reason));
+    });
 };
