@@ -53,7 +53,8 @@ function get_packed_file_path(paths_to_pack) {
         grunt.file.setBase(temp_dir);
         var expanded = grunt.file.expand(paths_to_pack);
         return function (entry) {
-            var relative_path = entry.path.replace(temp_dir.toString(), '').slice(1);
+            var entry_path = entry.path.replace(/\\/g, '/');
+            var relative_path = entry_path.replace(temp_dir.replace(/\\/g, '/'), '').slice(1);
             if (first) {
                 first = false;
                 return true;
