@@ -9,6 +9,7 @@ var temp = require('temp');
 var pack = require('tar-pack').pack;
 var grunt = require('grunt');
 var ncp = require('ncp').ncp;
+var rimraf = require('rimraf');
 
 log.info("running prades publish!");
 var get_redirect_location = require('./lib/get_location')(log);
@@ -40,6 +41,16 @@ function get_signed_target_url(config) {
     }
 
     return credentials.then(request_put_to_registry).then(get_redirect_location);
+}
+
+function remove(temp_dir)  {
+    if (!options.debug) {
+        setImmediate(function () {
+            rimraf(temp_dir, function (err) {
+                if (err) {log.warn("Can't remove temp dir", err.message);}
+            });
+        });
+    }
 }
 
 // takes a path to pack
@@ -84,6 +95,7 @@ function get_packed_file_path(paths_to_pack) {
                     var time3 = new Date();
                     log.info('PACK', 'done ('+ temp_file.path + ') took ' + ((time3 - time2)/1000) + "seconds");
                     fulfill(temp_file.path);
+                    remove(temp_dir);
                 });
         });
     });
@@ -101,6 +113,7 @@ function put(url, file_path) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
             var time2 = new Date();
             log.http(res.statusCode, 'Uploaded successfully. took ' + ((time2 - time1)/1000) + "seconds");
+            remove(file_path);
         } else {
             log.http(res.statusCode, res.body);
             throw("error uploading file");
@@ -112,9 +125,6 @@ function put(url, file_path) {
 
 module.exports = function (opt) {
     options = opt || {};
-    if (!options.debug) {
-        temp.track();
-    }
     return package_json.then(function (config) {
         return Promise.all([
             get_signed_target_url(config),
@@ -125,7 +135,8 @@ module.exports = function (opt) {
             var file_path = ary[1];
             put(url, file_path);
         });
-    }).catch((reason) => {
+    })
+    .catch((reason) => {
         log.error(reason);
         throw(Error(reason));
     });
