@@ -56,6 +56,7 @@ function remove(temp_dir)  {
 // takes a path to pack
 // returns a Promise of the packed file
 function get_packed_file_path(paths_to_pack) {
+    paths_to_pack.push('!package.json');
     var temp_file = temp.createWriteStream();
     var temp_dir = temp.mkdirSync('prades_packer');
     var first = true;
