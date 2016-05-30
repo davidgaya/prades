@@ -188,6 +188,28 @@ describe("publish and install", function () {
         .then(done, done);
     });
 
+    it("fifth example, no binary section in package.json", function (done) {
+        var packageJson = {
+            "name": "@sb/prades_test_1",
+            "version": "0.0.01",
+            "dependencies": {
+                "@sb/prades": "file:../.."
+            },
+            "license": "ISC", repository: '.'
+        };
+        writePackageJson(packageJson)
+        .then(publish)
+        .then(function resolve(val) {
+            done("Should have failed and it didn't.");
+        }, function reject(reason) {
+            assert.ok(
+                /binary section is missing/.test(reason.message),
+                "Should give a clear message that binary section is missing"
+            );
+            done();
+        }).catch(console.log);
+    });
+
 });
 
 function clean_install_dir() {
