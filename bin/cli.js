@@ -21,6 +21,13 @@ program
     .option('-d, --debug', 'Debug')
     .action(publish);
 
+program
+    .command('unpublish')
+    .description('remove binary package from repo')
+    .option('-v, --verbose', 'Be verbose')
+    .option('-d, --debug', 'Debug')
+    .action(unpublish);
+
 program.parse(process.argv);
 
 function install(options) {
@@ -29,6 +36,10 @@ function install(options) {
 
 function publish(options) {
     return require('../publish')(options).catch(() => process.exit(1));
+}
+
+function unpublish(options) {
+    return require('../unpublish')(options).catch(() => process.exit(1));
 }
 
 if (!program.args.length) {
