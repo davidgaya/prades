@@ -29,7 +29,7 @@ var writeFile = promisify(fs.writeFile);
 */
 
 describe("publish and install", function () {
-    this.timeout(7000);
+    this.timeout(8000);
 
     beforeEach(function (done) {
         clean_install_dir().then(done, done);
@@ -55,9 +55,10 @@ describe("publish and install", function () {
                 ],
                 "host": "https://registry-node.starbreeze.com/-/releases"
             },
-            "license": "ISC", repository: '.'
+            "license": "ISC", "repository": "."
         };
         writePackageJson(packageJson)
+        .then(unpublish)
         .then(publish)
         .then(install)
         .then(function () {
@@ -95,9 +96,10 @@ describe("publish and install", function () {
                 ],
                 "host": "https://registry-node.starbreeze.com/-/releases"
             },
-            "license": "ISC", repository: '.'
+            "license": "ISC", "repository": "."
         };
         writePackageJson(packageJson)
+        .then(unpublish)
         .then(publish)
         .then(install)
         .then(function () {
@@ -132,9 +134,10 @@ describe("publish and install", function () {
                 ],
                 "host": "https://registry-node.starbreeze.com/-/releases"
             },
-            "license": "ISC", repository: '.'
+            "license": "ISC", "repository": "."
         };
         writePackageJson(packageJson)
+        .then(unpublish)
         .then(publish)
         .then(install)
         .then(function () {
@@ -167,9 +170,10 @@ describe("publish and install", function () {
                 ],
                 "host": "https://registry-node.starbreeze.com/-/releases"
             },
-            "license": "ISC", repository: '.'
+            "license": "ISC", "repository": "."
         };
         writePackageJson(packageJson)
+        .then(unpublish)
         .then(publish)
         .then(install)
         .then(function () {
@@ -195,9 +199,10 @@ describe("publish and install", function () {
             "dependencies": {
                 "@sb/prades": "file:../.."
             },
-            "license": "ISC", repository: '.'
+            "license": "ISC", "repository": "."
         };
         writePackageJson(packageJson)
+        .then(unpublish)
         .then(publish)
         .then(function resolve(val) {
             done("Should have failed and it didn't.");
@@ -208,6 +213,26 @@ describe("publish and install", function () {
             );
             done();
         }).catch(console.log);
+    });
+
+    it("unpublish example", function (done) {
+        var packageJson = {
+            "name": "@sb/prades_test_1",
+            "version": "0.0.01",
+            "dependencies": {
+                "@sb/prades": "file:../.."
+            },
+            "binary": {
+                "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
+                "path": ["boost/nothing"],
+                "host": "https://registry-node.starbreeze.com/-/releases"
+            },
+            "license": "ISC", "repository": "."
+        };
+        writePackageJson(packageJson)
+        .then(unpublish)
+        .then(done)
+        .catch(console.log);
     });
 
 });
@@ -225,6 +250,10 @@ function writePackageJson(conf) {
 
 function publish() {
     return exec("node ../../bin/cli.js publish", {cwd: 'test/publish'});
+}
+
+function unpublish() {
+    return exec("node ../../bin/cli.js unpublish", {cwd: 'test/publish'});
 }
 
 function install() {

@@ -5,37 +5,16 @@ var promisify = require('./lib/promisify');
 var request = require('request');
 var log = require('npmlog');
 var unpack = require('tar-pack').unpack;
+var url_signer = require('./lib/url_signer');
 
 log.info("running prades install!");
-var get_redirect_location = require('./lib/get_location')(log);
+
 var package_json = require('./lib/package')({logger: log});
-var npm_credentials = require('./lib/npm_credentials');
 var options;
 
 // takes host and path
 // returns a Promise of the signed url
-function get_signed_source_url(config) {
-    var credentials = npm_credentials({
-        host: config.host(),
-        logger: log
-    });
-    var host = config.host();
-    var file_name = config.file_name();
-
-    function request_get_to_registry(token) {
-        log.http('GET', host + file_name);
-        return promisify(request)({
-            baseUrl: host,
-            uri: file_name,
-            followRedirect: false,
-            auth: {
-                bearer: token
-            }
-        });
-    }
-
-    return credentials.then(request_get_to_registry).then(get_redirect_location);
-}
+var get_signed_source_url = url_signer('GET', log);
 
 // takes a url
 // returns a Promise of the packed stream
