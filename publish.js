@@ -11,6 +11,7 @@ var grunt = require('grunt');
 var ncp = require('ncp').ncp;
 var rimraf = require('rimraf');
 var url_signer = require('./lib/url_signer');
+var fail_if_already_published = require('./lib/fail_if_already_published');
 
 log.info("running prades publish!");
 
@@ -20,7 +21,6 @@ var options;
 // takes host and path
 // returns a Promise of the signed url
 var get_signed_target_url = url_signer('PUT', log);
-var url_already_exists = url_signer('HEAD', log);
 
 function remove(temp_dir)  {
     if (!options.debug) {
@@ -108,7 +108,7 @@ function put(url, file_path) {
 
 module.exports = function (opt) {
     options = opt || {};
-    return package_json.then(function (config) {
+    return package_json.then(fail_if_already_published).then(function (config) {
         return Promise.all([
             get_signed_target_url(config),
             get_packed_file_path(config.path())
@@ -121,6 +121,7 @@ module.exports = function (opt) {
     })
     .catch((reason) => {
         log.error(reason);
-        throw(Error(reason));
+        var error = reason instanceof Error ? reason : new Error(reason);
+        throw(error);
     });
 };
