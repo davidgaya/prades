@@ -31,6 +31,12 @@ var writeFile = promisify(fs.writeFile);
 describe("publish and install", function () {
     this.timeout(8000);
 
+    before(function (done) {
+        writePackageJson({"name": "@sb/prades_test_1", "version": "0.0.01"})
+            .then(npm_unpublish)
+            .then((output) => {done();}).catch(console.log);
+    });
+
     beforeEach(function (done) {
         clean_install_dir().then(done, done);
     });
@@ -254,6 +260,14 @@ function publish() {
 
 function unpublish() {
     return exec("node ../../bin/cli.js unpublish", {cwd: 'test/publish'});
+}
+
+function npm_publish() {
+    return exec("npm publish", {cwd: 'test/publish'});
+}
+
+function npm_unpublish() {
+    return exec("npm unpublish -f", {cwd: 'test/publish'});
 }
 
 function install() {
