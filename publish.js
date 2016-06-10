@@ -108,7 +108,11 @@ function put(url, file_path) {
 
 module.exports = function (opt) {
     options = opt || {};
-    return package_json.then(fail_if_npm_frozen).then(function (config) {
+    var p = package_json;
+    if (!options.force) {
+        p = p.then(fail_if_npm_frozen);
+    }
+    return p.then(function (config) {
         return Promise.all([
             get_signed_target_url(config),
             get_packed_file_path(config.path())

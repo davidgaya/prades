@@ -35,8 +35,11 @@ function del(url) {
 
 module.exports = function (opt) {
     options = opt || {};
-    return package_json
-        .then(fail_if_npm_frozen)
+    var p = package_json;
+    if (!options.force) {
+        p = p.then(fail_if_npm_frozen);
+    }
+    return p
         .then(get_signed_target_url)
         .then(del)
         .catch((reason) => {

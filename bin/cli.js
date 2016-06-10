@@ -19,6 +19,7 @@ program
     .description('zip and upload binaries')
     .option('-v, --verbose', 'Be verbose')
     .option('-d, --debug', 'Debug')
+    .option('-f, --force', 'Force publishing')
     .action(publish);
 
 program
@@ -26,6 +27,7 @@ program
     .description('remove binary package from repo')
     .option('-v, --verbose', 'Be verbose')
     .option('-d, --debug', 'Debug')
+    .option('-f, --force', 'Force publishing')
     .action(unpublish);
 
 program.parse(process.argv);
