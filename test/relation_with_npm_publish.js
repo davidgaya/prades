@@ -71,7 +71,15 @@ describe("relation with npm publish", function () {
         it("cannot publish binaries", function (done) {
             publish().then(function () {
                 done(new Error("Publish should fail and it didn't"));
-            }, function (error) {
+            }, function () {
+                done();
+            });
+        });
+
+        it("cannot unpublish binaries", function (done) {
+            unpublish().then(function () {
+                done(new Error("Unpublish should fail and it didn't"));
+            }, function () {
                 done();
             });
         });
