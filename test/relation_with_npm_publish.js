@@ -76,6 +76,10 @@ describe("relation with npm publish", function () {
             });
         });
 
+        it("can force publish binaries", function (done) {
+            publish('-f').then(done).catch(console.log);
+        });
+
         it("cannot unpublish binaries", function (done) {
             unpublish().then(function () {
                 done(new Error("Unpublish should fail and it didn't"));
@@ -83,6 +87,11 @@ describe("relation with npm publish", function () {
                 done();
             });
         });
+
+        it("can force unpublish binaries", function (done) {
+            unpublish('-f').then(done).catch(console.log);
+        });
+
     });
 
 });
@@ -91,12 +100,14 @@ function writePackageJson(conf) {
     return writeFile("./test/publish/package.json", JSON.stringify(conf));
 }
 
-function publish() {
-    return exec("node ../../bin/cli.js publish", {cwd: 'test/publish'}).then(() => {});
+function publish(opt) {
+    opt = opt || '';
+    return exec("node ../../bin/cli.js publish " + opt, {cwd: 'test/publish'}).then(() => {});
 }
 
-function unpublish() {
-    return exec("node ../../bin/cli.js unpublish", {cwd: 'test/publish'}).then(() => {});
+function unpublish(opt) {
+    opt = opt || '';
+    return exec("node ../../bin/cli.js unpublish " + opt, {cwd: 'test/publish'}).then(() => {});
 }
 
 function npm_publish() {
