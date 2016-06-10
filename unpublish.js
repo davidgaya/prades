@@ -6,6 +6,7 @@ var request = require('request');
 var fs = require('fs');
 var log = require('npmlog');
 var url_signer = require('./lib/url_signer');
+var fail_if_npm_frozen = require('./lib/fail_if_npm_frozen');
 
 log.info("running prades unpublish!");
 
@@ -35,6 +36,7 @@ function del(url) {
 module.exports = function (opt) {
     options = opt || {};
     return package_json
+        .then(fail_if_npm_frozen)
         .then(get_signed_target_url)
         .then(del)
         .catch((reason) => {

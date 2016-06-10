@@ -11,7 +11,7 @@ var grunt = require('grunt');
 var ncp = require('ncp').ncp;
 var rimraf = require('rimraf');
 var url_signer = require('./lib/url_signer');
-var fail_if_already_published = require('./lib/fail_if_already_published');
+var fail_if_npm_frozen = require('./lib/fail_if_npm_frozen');
 
 log.info("running prades publish!");
 
@@ -108,7 +108,7 @@ function put(url, file_path) {
 
 module.exports = function (opt) {
     options = opt || {};
-    return package_json.then(fail_if_already_published).then(function (config) {
+    return package_json.then(fail_if_npm_frozen).then(function (config) {
         return Promise.all([
             get_signed_target_url(config),
             get_packed_file_path(config.path())
