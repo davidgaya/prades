@@ -49,4 +49,9 @@ module.exports = function () {
         assert(!fs.existsSync(path), "Should not exist: " + path);
     };
 
+    this.show_info = function publish(opt) {
+        opt = opt || '';
+        return exec("node ../../bin/cli.js info " + opt, {cwd: 'test/publish'});
+    };
+
 };
