@@ -1,10 +1,7 @@
 'use strict';
 
-var promisify = require('../lib/promisify');
-var exec = promisify(require('child_process').exec);
+require('./utils')(); /* globals writePackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
 var assert = require('assert');
-var fs = require('fs');
-var writeFile = promisify(fs.writeFile);
 
 /* this are the fs fixtures
  ├── install
@@ -33,8 +30,7 @@ describe("publish and install", function () {
 
     before(function (done) {
         writePackageJson({"name": "@sb/prades_test_1", "version": "0.0.01"})
-            .then(npm_unpublish)
-            .then((output) => {done();}).catch(console.log);
+            .then(npm_unpublish).then(done).catch(console.log);
     });
 
     beforeEach(function (done) {
@@ -242,42 +238,3 @@ describe("publish and install", function () {
     });
 
 });
-
-function clean_install_dir() {
-    var rimraf = promisify(require('rimraf'));
-    return rimraf("test/install/boost").then(function () {
-       return rimraf("test/install/extra_readme.md");
-    });
-}
-
-function writePackageJson(conf) {
-    return writeFile("./test/publish/package.json", JSON.stringify(conf));
-}
-
-function publish() {
-    return exec("node ../../bin/cli.js publish", {cwd: 'test/publish'});
-}
-
-function unpublish() {
-    return exec("node ../../bin/cli.js unpublish", {cwd: 'test/publish'});
-}
-
-function npm_publish() {
-    return exec("npm publish", {cwd: 'test/publish'});
-}
-
-function npm_unpublish() {
-    return exec("npm unpublish -f", {cwd: 'test/publish'});
-}
-
-function install() {
-    return exec("node ../../bin/cli.js install", {cwd: 'test/install'});
-}
-
-function assert_exists(path) {
-    assert(fs.existsSync(path), "Does not exist: " + path);
-}
-
-function assert_not_exists(path) {
-    assert(!fs.existsSync(path), "Should not exist: " + path);
-}

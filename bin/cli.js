@@ -30,18 +30,32 @@ program
     .option('-f, --force', 'Force publishing')
     .action(unpublish);
 
+program
+    .command('info')
+    .description('show package info')
+    .option('-v, --verbose', 'Be verbose')
+    .action(show_info);
+
 program.parse(process.argv);
 
+function exit_with_error() {
+    process.exit(1);
+}
+
 function install(options) {
-    return require('../install')(options).catch(() => process.exit(1));
+    return require('../install')(options).catch(exit_with_error);
 }
 
 function publish(options) {
-    return require('../publish')(options).catch(() => process.exit(1));
+    return require('../publish')(options).catch(exit_with_error);
 }
 
 function unpublish(options) {
-    return require('../unpublish')(options).catch(() => process.exit(1));
+    return require('../unpublish')(options).catch(exit_with_error);
+}
+
+function show_info(options) {
+    return require('../show_info')(options).catch(exit_with_error);
 }
 
 if (!program.args.length) {

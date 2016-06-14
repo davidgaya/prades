@@ -1,10 +1,6 @@
 'use strict';
 
-var promisify = require('../lib/promisify');
-var exec = promisify(require('child_process').exec);
-var assert = require('assert');
-var fs = require('fs');
-var writeFile = promisify(fs.writeFile);
+require('./utils')(); /* globals writePackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
 
 /* this are the fs fixtures
  ├── install
@@ -95,29 +91,3 @@ describe("relation with npm publish", function () {
     });
 
 });
-
-function writePackageJson(conf) {
-    return writeFile("./test/publish/package.json", JSON.stringify(conf));
-}
-
-function publish(opt) {
-    opt = opt || '';
-    return exec("node ../../bin/cli.js publish " + opt, {cwd: 'test/publish'}).then(() => {});
-}
-
-function unpublish(opt) {
-    opt = opt || '';
-    return exec("node ../../bin/cli.js unpublish " + opt, {cwd: 'test/publish'}).then(() => {});
-}
-
-function npm_publish() {
-    return exec("npm publish", {cwd: 'test/publish'}).then(() => {});
-}
-
-function npm_unpublish() {
-    return exec("npm unpublish -f", {cwd: 'test/publish'}).then(() => {});
-}
-
-function install() {
-    return exec("node ../../bin/cli.js install", {cwd: 'test/install'});
-}
