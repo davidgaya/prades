@@ -2,7 +2,7 @@
 'use strict';
 
 var promisify = require('./lib/promisify');
-var request = require('request');
+var request = promisify(require('request'));
 var log = require('npmlog');
 var url_signer = require('./lib/url_signer');
 var package_json = require('./lib/package')({logger: log});
@@ -18,28 +18,13 @@ var load = promisify(npm.load);
 var view = promisify(npm.view);
 
 // takes a url
-// returns a Promise of the packed stream
-function get_stream(url) {
-    return new Promise(function (fulfill, reject) {
-        log.http("GET", url);
-        var r = request(url);
-        var string = '';
-        r.on('data',function(part){
-            string += part;
+// returns a Promise of the body
+function get_xml_body(url) {
+    return request(url)
+        .then((req) => {
+            if (req.statusCode !== 200) {throw(new Error("S3 error. " + req.body));}
+            return req.body;
         });
-        r.on('end',function(){
-            fulfill(string);
-        });
-        r.on('response', (res) => {
-            log.http(res.statusCode);
-            if (res.statusCode < 200 && res.statusCode >= 300) {
-                var err = Error("Nothing to see here.");
-                log.error("ERROR", err);
-                reject(err);
-            }
-        });
-        r.on('error', (err) => { reject(err); });
-    });
 }
 
 function get_binary_list() {
@@ -47,19 +32,20 @@ function get_binary_list() {
         config.file_name = () => '/';
         return get_signed_source_url(config)
             .then((url) => url + "&prefix=" + config.package_name() + "/"+ config.version() + "&list-type=2")
-            .then(get_stream).then(function (xml_body) {
-                xml_parse(xml_body).then(function (js_body) {
-                    console.log(js_body.ListBucketResult.Contents.map(function (el) {
-                        return {
-                            file: el.Key[0],
-                            last_modified: el.LastModified[0],
-                            size: parseInt(el.Size[0], 10),
-                            md5: el.ETag[0].replace(/^\"(.*)\"$/, "$1")
-                        };
-                    }));
-                });
-                //console.log(xml_body);
-            });
+            .then(get_xml_body)
+            .then((xml_body) => xml_parse(xml_body))
+            .then((js_body) => js_body.ListBucketResult.Contents)
+            .then((contents) =>
+                contents.map(function (el) {
+                    return {
+                        file: el.Key[0],
+                        last_modified: el.LastModified[0],
+                        size: parseInt(el.Size[0], 10),
+                        md5: el.ETag[0].replace(/^\"(.*)\"$/, "$1")
+                    };
+                })
+            )
+            .then(console.log);
     }).catch((reason) => {
         log.error(reason);
         throw(Error(reason));
@@ -72,7 +58,7 @@ module.exports = function (opt) {
     return load()
         .then(()=>view())
         .catch((reason) => {
-            log.error("not published");
+            log.error("This package is not published.");
             console.log('This package is not published.');
         })
         .then(get_binary_list);
