@@ -1,8 +1,7 @@
-var koa = require('koa');
-var app = module.exports = koa();
-
-app.use(function *(){
-  this.body = 'Hey!';
-});
-
-if (!module.parent) app.listen(3000);
+var crypto;
+try {
+    crypto = require('crypto');
+    console.log('crypto support is enabled!');
+} catch (err) {
+    console.log('crypto support is disabled!');
+}
