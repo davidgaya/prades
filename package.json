@@ -1,7 +1,7 @@
 {
   "name": "@sb/prades",
   "version": "0.2.3",
-  "description": "Tool to embed large binary objects in packages",
+  "description": "Tool to embed large binary objects in npm packages",
   "main": "index.js",
   "bin": {
     "prades": "./bin/cli.js"
@@ -9,6 +9,7 @@
   "dependencies": {
     "commander": "2.9.0",
     "fs": "0.0.2",
+    "grunt": "^1.0.1",
     "ncp": "^2.0.0",
     "npm": "^3.8.9",
     "npmlog": "2.0.3",
@@ -22,10 +23,9 @@
   "scripts": {
     "test": "./node_modules/.bin/mocha"
   },
-  "author": "",
+  "author": "StarbreezeStudios",
   "license": "ISC",
   "devDependencies": {
-    "grunt": "^1.0.1",
     "mocha": "^2.4.5",
     "rimraf": "^2.5.2"
   },
@@ -33,5 +33,9 @@
     "esversion": 6,
     "node": true,
     "mocha": true
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "git@github.com:fl4re/prades.git"
   }
 }
