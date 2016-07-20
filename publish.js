@@ -22,7 +22,9 @@ var options;
 // returns a Promise of the signed url
 var get_signed_target_url = url_signer('PUT', log);
 
+var original_directory = process.cwd();
 function remove(temp_dir)  {
+    grunt.file.setBase(original_directory);
     if (!options.debug) {
         setImmediate(function () {
             rimraf(temp_dir, function (err) {
