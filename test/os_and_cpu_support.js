@@ -148,7 +148,7 @@ describe('os and cpu options', function () {
                 .then(() => assert_exists("./test/install/boost"))
                 .then(done, done);
         });
-        it('gives an error if the os in NOT enabled', function (done) {
+        it('skips install if the os in NOT enabled', function (done) {
             var packageJson = {
                 "name": "@sb/prades_test_1",
                 "version": "0.0.01",
@@ -165,7 +165,7 @@ describe('os and cpu options', function () {
                 .then(() => assert_not_exists("./test/install/boost"))
                 .then(done, done);
         });
-        it('gives an error if the cpu in NOT enabled', function (done) {
+        it('skips install if the cpu in NOT enabled', function (done) {
             var packageJson = {
                 "name": "@sb/prades_test_1",
                 "version": "0.0.01",
