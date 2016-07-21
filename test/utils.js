@@ -8,8 +8,12 @@ var assert = require('assert');
 
 module.exports = function () {
 
-    this.writePackageJson = function (conf) {
+    this.writePackageJson = function writePackageJson(conf) {
         return writeFile("./test/publish/package.json", JSON.stringify(conf));
+    };
+
+    this.writeInstallPackageJson = function writePackageJson(conf) {
+        return writeFile("./test/install/package.json", JSON.stringify(conf));
     };
 
     this.publish = function publish(opt) {
@@ -49,7 +53,7 @@ module.exports = function () {
         assert(!fs.existsSync(path), "Should not exist: " + path);
     };
 
-    this.show_info = function publish(opt) {
+    this.show_info = function show_info(opt) {
         opt = opt || '';
         return exec("node ../../bin/cli.js info " + opt, {cwd: 'test/publish'});
     };

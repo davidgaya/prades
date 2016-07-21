@@ -6,13 +6,13 @@ var request = require('request');
 var log = require('npmlog');
 var unpack = require('tar-pack').unpack;
 var url_signer = require('./lib/url_signer');
-
+const is_platform_enabled = require('./lib/is_platform_enabled');
 log.info("running prades install!");
 
 var package_json = require('./lib/package')({logger: log});
 var options;
 
-// takes host and path
+// takes a config with host and file_name
 // returns a Promise of the signed url
 var get_signed_source_url = url_signer('GET', log);
 
@@ -50,13 +50,17 @@ function extract_stream(packed_stream) {
 module.exports = function (opt) {
     options = opt;
 
-    return package_json.then(function (config) {
-        return get_signed_source_url(config)
-            .then(get_stream)
-            .then(extract_stream);
-    }).catch((reason) => {
-        log.error(reason);
-        throw(Error(reason));
-    });
-
+    return package_json
+        .then(is_platform_enabled)
+        .then(function (config) {
+            return get_signed_source_url(config)
+                .then(get_stream)
+                .then(extract_stream)
+                .catch((reason) => {
+                    log.error(reason);
+                    throw(Error(reason));
+                });
+        }, function (reason) {
+            log.info("Nothing to do. " + reason);
+        });
 };

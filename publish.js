@@ -11,8 +11,8 @@ var grunt = require('grunt');
 var ncp = require('ncp').ncp;
 var rimraf = require('rimraf');
 var url_signer = require('./lib/url_signer');
-var fail_if_npm_frozen = require('./lib/fail_if_npm_frozen');
-
+const fail_if_npm_frozen = require('./lib/fail_if_npm_frozen');
+const is_platform_enabled = require('./lib/is_platform_enabled');
 log.info("running prades publish!");
 
 var package_json = require('./lib/package')({logger: log});
@@ -112,7 +112,7 @@ module.exports = function (opt) {
     options = opt || {};
     var p = package_json;
     if (!options.force) {
-        p = p.then(fail_if_npm_frozen);
+        p = p.then(fail_if_npm_frozen).then(is_platform_enabled);
     }
     return p.then(function (config) {
         return Promise.all([
