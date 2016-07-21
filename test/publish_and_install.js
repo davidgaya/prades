@@ -1,6 +1,6 @@
 'use strict';
 
-require('./utils')(); /* globals writePackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
+require('./utils')(); /* globals writePackageJson, writeInstallPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
 var assert = require('assert');
 
 /* this are the fs fixtures
@@ -28,6 +28,24 @@ var assert = require('assert');
 describe("publish and install", function () {
     this.timeout(8000);
 
+    before(function(done) {
+        const install_package_json = {
+                "name": "@sb/prades_test_1",
+                "version": "0.0.01",
+                "dependencies": {
+                    "@sb/prades": "file:../.."
+                },
+                "binary": {
+                    "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
+                    "path": [
+                        "it doesn't matter what we have here, because we only use this package.json to install"
+                    ],
+                    "host": "https://registry-node.starbreeze.com/-/releases"
+                }
+            }
+            ;
+        writeInstallPackageJson(install_package_json).then(done, done);
+    });
     before(function (done) {
         writePackageJson({"name": "@sb/prades_test_1", "version": "0.0.01"})
             .then(npm_unpublish).then(done).catch(console.log);

@@ -64,7 +64,7 @@ describe("prades info", function () {
 
         it("shows prades info", function (done) {
             show_info().then(function (output) {
-                assert.ok(/node_46\-linux\-x64\.tar\.gz/.test(output), "binary does not exist");
+                assert.ok(/\-linux\-x64\.tar\.gz/.test(output), "binary does not exist");
                 assert.ok(/0\.0\.1/.test(output), "version does not exist");
                 done();
             }).catch((reason) => {console.log(reason); done(reason);});
