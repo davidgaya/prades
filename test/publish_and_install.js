@@ -26,7 +26,7 @@ var assert = require('assert');
 */
 
 describe("publish and install", function () {
-    this.timeout(8000);
+    this.timeout(process.env.TIMEOUT || 8000);
 
     before(function(done) {
         const install_package_json = {

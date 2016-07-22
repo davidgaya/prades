@@ -10,7 +10,7 @@ var fail_if_npm_frozen = require('./lib/fail_if_npm_frozen');
 
 log.info("running prades unpublish!");
 
-var package_json = require('./lib/package')({logger: log});
+var package_json = require('./lib/package')(log);
 var options;
 
 // takes host and path

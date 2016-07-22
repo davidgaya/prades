@@ -5,7 +5,7 @@ var promisify = require('./lib/promisify');
 var request = promisify(require('request'));
 var log = require('npmlog');
 var url_signer = require('./lib/url_signer');
-var package_json = require('./lib/package')({logger: log});
+var package_json = require('./lib/package')(log);
 var get_signed_source_url = url_signer('GET', log);
 var xml_parse = promisify(require('xml2js').parseString);
 
