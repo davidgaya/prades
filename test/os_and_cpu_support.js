@@ -10,7 +10,7 @@ require('./utils')(); /* globals writePackageJson, writeInstallPackageJson, publ
 const assert = require('assert');
 
 describe('os and cpu options', function () {
-    this.timeout(8000);
+    this.timeout(process.env.TIMEOUT || 8000);
 
     before(function (done) {
         writePackageJson({"name": "@sb/prades_test_1", "version": "0.0.01"})

@@ -20,7 +20,7 @@ var packageJson = {
 };
 
 describe("prades info", function () {
-    this.timeout(8000);
+    this.timeout(process.env.TIMEOUT || 8000);
 
     before(function(done) {
       writePackageJson(packageJson)
@@ -64,7 +64,8 @@ describe("prades info", function () {
 
         it("shows prades info", function (done) {
             show_info().then(function (output) {
-                assert.ok(/\-linux\-x64\.tar\.gz/.test(output), "binary does not exist");
+                var regExp = new RegExp("\-" + process.platform + "\-" + process.arch + "\.tar\.gz");
+                assert.ok(regExp.test(output), "binary does not exist");
                 assert.ok(/0\.0\.1/.test(output), "version does not exist");
                 done();
             }).catch((reason) => {console.log(reason); done(reason);});

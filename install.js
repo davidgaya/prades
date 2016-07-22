@@ -9,7 +9,7 @@ var url_signer = require('./lib/url_signer');
 const is_platform_enabled = require('./lib/is_platform_enabled');
 log.info("running prades install!");
 
-var package_json = require('./lib/package')({logger: log});
+var package_json = require('./lib/package')(log);
 var options;
 
 // takes a config with host and file_name

@@ -41,7 +41,7 @@ var packageJson = {
 };
 
 describe("relation with npm publish", function () {
-    this.timeout(8000);
+    this.timeout(process.env.TIMEOUT || 8000);
 
     before(function(done) {
       writePackageJson(packageJson).then(done).catch(console.log);
