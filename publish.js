@@ -32,7 +32,7 @@ function put(url, file_path) {
         req.on('response', function (res) {
             if (res.statusCode >= 200 && res.statusCode < 300) {
                 var time2 = new Date();
-                log.http(res.statusCode, 'Uploaded successfully. took ' + ((time2 - time1)/1000) + "seconds");
+                log.http(res.statusCode, 'Upload took ' + ((time2 - time1)/1000) + "seconds");
                 fulfill();
             } else {
                 log.http(res.statusCode, res.body);
