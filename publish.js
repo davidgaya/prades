@@ -8,6 +8,7 @@ var log = require('npmlog');
 const url_signer = require('./lib/url_signer');
 const fail_if_npm_frozen = require('./lib/fail_if_npm_frozen');
 const is_platform_enabled = require('./lib/is_platform_enabled');
+const benchmark = require('./lib/benchmark');
 log.info("running prades publish!");
 
 var package_json = require('./lib/package')(log);
@@ -21,27 +22,25 @@ var get_signed_target_url = url_signer('PUT', log);
 var get_packed_file_path = require('./lib/publish/get_packed_file_path');
 
 function put(url, file_path) {
-    return new Promise(function (fulfill, reject) {
-        var time1 = new Date();
+    var promise = new Promise(function (fulfill, reject) {
         log.http("PUT", url);
         var headers = {
             'content-type': 'application/octet-stream',
             'content-length': fs.statSync(file_path).size
         };
         var req = request.put({uri: url, headers: headers});
+        req.on('error', (err) => reject(err));
         req.on('response', function (res) {
             if (res.statusCode >= 200 && res.statusCode < 300) {
-                var time2 = new Date();
-                log.http(res.statusCode, 'Upload took ' + ((time2 - time1)/1000) + "seconds");
-                fulfill();
+                fulfill("Success upload");
             } else {
-                log.http(res.statusCode, res.body);
-                reject("error uploading file");
+                reject("Error uploading file. Status: " + res.statusCode + ". " + res.body);
             }
         });
-        req.on('error', (err) => {reject(err);});
         fs.createReadStream(file_path).pipe(req);
     });
+    promise.then(benchmark()).then((msg) => log.http('200', msg));
+    return promise;
 }
 
 module.exports = function (options) {
