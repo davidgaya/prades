@@ -6,7 +6,7 @@ var fs = require('fs');
 var log = require('npmlog');
 
 const url_signer = require('./lib/url_signer');
-const fail_if_npm_frozen = require('./lib/fail_if_npm_frozen');
+const is_npm_frozen = require('./lib/is_npm_frozen');
 const is_platform_enabled = require('./lib/is_platform_enabled');
 const benchmark = require('./lib/benchmark');
 log.info("running prades publish!");
@@ -46,22 +46,16 @@ function put(url, file_path) {
 module.exports = function (options) {
     var p = package_json;
     if (!options.force) {
-        p = p.then(fail_if_npm_frozen).then(is_platform_enabled);
+        p = p.then(is_npm_frozen).then(is_platform_enabled);
     }
-    return p.then(function (config) {
-        return Promise.all([
+    return p.then( (config) =>
+        Promise.all([
             get_signed_target_url(config),
             get_packed_file_path(config.path(), options, log)
-        ]).then(function (ary) {
-            // This is the ugly part of Promise.all, we get an array of fulfilled values
-            var url = ary[0];
-            var file_path = ary[1];
-            return put(url, file_path);
-        });
-    })
+        ]).then((results) => put(results[0], results[1]))
+    )
     .catch((reason) => {
         log.error(reason);
-        var error = reason instanceof Error ? reason : new Error(reason);
-        throw(error);
+        throw(reason);
     });
 };
