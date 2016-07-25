@@ -1,6 +1,6 @@
 'use strict';
 
-require('./utils')(); /* globals writePackageJson, writeInstallPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
+require('./utils')(); /* globals std_package_json, writePackageJson, writeInstallPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
 var assert = require('assert');
 
 /* this are the fs fixtures
@@ -28,57 +28,29 @@ var assert = require('assert');
 describe("publish and install", function () {
     this.timeout(process.env.TIMEOUT || 8000);
 
-    before(function(done) {
-        const install_package_json = {
-                "name": "@sb/prades_test_1",
-                "version": "0.0.01",
-                "dependencies": {
-                    "@sb/prades": "file:../.."
-                },
-                "binary": {
-                    "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
-                    "path": [
-                        "it doesn't matter what we have here, because we only use this package.json to install"
-                    ],
-                    "host": "https://registry-node.starbreeze.com/-/releases"
-                }
-            }
-            ;
-        writeInstallPackageJson(install_package_json).then(done, done);
-    });
-    before(function (done) {
-        writePackageJson({"name": "@sb/prades_test_1", "version": "0.0.01"})
-            .then(npm_unpublish).then(done).catch(console.log);
-    });
+    before(() =>
+        writeInstallPackageJson(std_package_json())
+    );
+    before(() =>
+        writePackageJson(std_package_json()).then(npm_unpublish)
+    );
 
-    beforeEach(function (done) {
-        clean_install_dir().then(done, done);
-    });
+    beforeEach(() =>
+        clean_install_dir()
+    );
 
-    after(function (done) {
-        clean_install_dir().then(done,done);
-    });
+    after(() =>
+        clean_install_dir()
+    );
 
-    it("first example", function (done) {
-        var packageJson = {
-            "name": "@sb/prades_test_1",
-            "version": "0.0.01",
-            "dependencies": {
-                "@sb/prades": "file:../.."
-            },
-            "binary": {
-                "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
-                "path": [
-                    "boost/**",
-                    "extra_readme.md",
-                    "!boost/dont_pack.this"
-                ],
-                "host": "https://registry-node.starbreeze.com/-/releases"
-            },
-            "license": "ISC", "repository": "."
-        };
-        writePackageJson(packageJson)
-        .then(unpublish)
+    it("first example", function () {
+        var packageJson = std_package_json();
+        packageJson.binary.path = [
+            "boost/**",
+            "extra_readme.md",
+            "!boost/dont_pack.this"
+        ];
+        return writePackageJson(packageJson)
         .then(publish)
         .then(install)
         .then(function () {
@@ -93,33 +65,20 @@ describe("publish and install", function () {
             assert_exists("./test/install/boost/stage/david_test.txt");
             assert_exists("./test/install/boost/linked_dir/linked_file.txt");
             assert_not_exists("./test/install/boost/dont_pack.this");
-        })
-        .then(done, done);
+        });
     });
 
-    it("second example", function (done) {
-        var packageJson = {
-            "name": "@sb/prades_test_1",
-            "version": "0.0.01",
-            "dependencies": {
-                "@sb/prades": "file:../.."
-            },
-            "binary": {
-                "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
-                "path": [
-                    "boost",
-                    "boost/linked_file.txt",
-                    "boost/linked_dir/**",
-                    "extra_readme.md",
-                    "boost/boost/**",
-                    "boost/stage/**"
-                ],
-                "host": "https://registry-node.starbreeze.com/-/releases"
-            },
-            "license": "ISC", "repository": "."
-        };
-        writePackageJson(packageJson)
-        .then(unpublish)
+    it("second example", function () {
+        var packageJson = std_package_json();
+        packageJson.binary.path = [
+            "boost",
+            "boost/linked_file.txt",
+            "boost/linked_dir/**",
+            "extra_readme.md",
+            "boost/boost/**",
+            "boost/stage/**"
+        ];
+        return writePackageJson(packageJson)
         .then(publish)
         .then(install)
         .then(function () {
@@ -134,30 +93,17 @@ describe("publish and install", function () {
             assert_exists("./test/install/boost/stage/david_test.txt");
             assert_exists("./test/install/boost/linked_dir/linked_file.txt");
             assert_not_exists("./test/install/boost/dont_pack.this");
-        })
-        .then(done, done);
+        });
     });
 
-    it("third example", function (done) {
-        var packageJson = {
-            "name": "@sb/prades_test_1",
-            "version": "0.0.01",
-            "dependencies": {
-                "@sb/prades": "file:../.."
-            },
-            "binary": {
-                "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
-                "path": [
-                    "boost",
-                    "boost/boost/**",
-                    "boost/stage/**"
-                ],
-                "host": "https://registry-node.starbreeze.com/-/releases"
-            },
-            "license": "ISC", "repository": "."
-        };
-        writePackageJson(packageJson)
-        .then(unpublish)
+    it("third example", function () {
+        var packageJson = std_package_json();
+        packageJson.binary.path = [
+            "boost",
+            "boost/boost/**",
+            "boost/stage/**"
+        ];
+        return writePackageJson(packageJson)
         .then(publish)
         .then(install)
         .then(function () {
@@ -172,28 +118,15 @@ describe("publish and install", function () {
             assert_exists("./test/install/boost/stage/david_test.txt");
             assert_not_exists("./test/install/boost/linked_dir/linked_file.txt");
             assert_not_exists("./test/install/boost/dont_pack.this");
-        })
-        .then(done, done);
+        });
     });
 
-    it("fourth example", function (done) {
-        var packageJson = {
-            "name": "@sb/prades_test_1",
-            "version": "0.0.01",
-            "dependencies": {
-                "@sb/prades": "file:../.."
-            },
-            "binary": {
-                "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
-                "path": [
-                    "boost/**"
-                ],
-                "host": "https://registry-node.starbreeze.com/-/releases"
-            },
-            "license": "ISC", "repository": "."
-        };
-        writePackageJson(packageJson)
-        .then(unpublish)
+    it("fourth example", function () {
+        var packageJson = std_package_json();
+        packageJson.binary.path = [
+            "boost/**"
+        ];
+        return writePackageJson(packageJson)
         .then(publish)
         .then(install)
         .then(function () {
@@ -208,23 +141,15 @@ describe("publish and install", function () {
             assert_exists("./test/install/boost/stage/david_test.txt");
             assert_exists("./test/install/boost/linked_dir/linked_file.txt");
             assert_exists("./test/install/boost/dont_pack.this");
-        })
-        .then(done, done);
+        });
     });
 
     it("fifth example, no binary section in package.json", function (done) {
-        var packageJson = {
-            "name": "@sb/prades_test_1",
-            "version": "0.0.01",
-            "dependencies": {
-                "@sb/prades": "file:../.."
-            },
-            "license": "ISC", "repository": "."
-        };
+        var packageJson = std_package_json();
+        delete packageJson.binary;
         writePackageJson(packageJson)
-        .then(unpublish)
         .then(publish)
-        .then(function resolve(val) {
+        .then(function resolve() {
             done("Should have failed and it didn't.");
         }, function reject(reason) {
             assert.ok(
@@ -235,23 +160,8 @@ describe("publish and install", function () {
         }).catch(console.log);
     });
 
-    it("unpublish example", function (done) {
-        var packageJson = {
-            "name": "@sb/prades_test_1",
-            "version": "0.0.01",
-            "dependencies": {
-                "@sb/prades": "file:../.."
-            },
-            "binary": {
-                "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
-                "path": ["boost/nothing"],
-                "host": "https://registry-node.starbreeze.com/-/releases"
-            },
-            "license": "ISC", "repository": "."
-        };
-        writePackageJson(packageJson)
-        .then(unpublish)
-        .then(done, done);
-    });
+    it("unpublish example", () =>
+        writePackageJson(std_package_json()).then(unpublish)
+    );
 
 });
