@@ -251,8 +251,7 @@ describe("publish and install", function () {
         };
         writePackageJson(packageJson)
         .then(unpublish)
-        .then(done)
-        .catch(console.log);
+        .then(done, done);
     });
 
 });
