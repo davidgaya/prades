@@ -29,19 +29,14 @@ describe("publish and install", function () {
     this.timeout(process.env.TIMEOUT || 8000);
 
     before(() =>
-        writeInstallPackageJson(std_package_json())
-    );
-    before(() =>
         writePackageJson(std_package_json()).then(npm_unpublish)
     );
 
-    beforeEach(() =>
-        clean_install_dir()
+    before(() =>
+        writeInstallPackageJson(std_package_json())
     );
 
-    after(() =>
-        clean_install_dir()
-    );
+    beforeEach( clean_install_dir );
 
     it("first example", function () {
         var packageJson = std_package_json();
