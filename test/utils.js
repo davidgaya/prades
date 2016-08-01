@@ -8,6 +8,22 @@ var assert = require('assert');
 
 module.exports = function () {
 
+    this.std_package_json = () => ({
+        "name": "@sb/prades_test_1",
+        "version": "0.0.01",
+        "dependencies": {
+            "@sb/prades": "file:../.."
+        },
+        "binary": {
+            "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
+            "path": [
+                "boost/**"
+            ],
+            "host": "https://registry-node.starbreeze.com/-/releases"
+        },
+        "license": "ISC", "repository": "."
+    });
+
     this.writePackageJson = function writePackageJson(conf) {
         return writeFile("./test/publish/package.json", JSON.stringify(conf));
     };
@@ -58,4 +74,10 @@ module.exports = function () {
         return exec("node ../../bin/cli.js info " + opt, {cwd: 'test/publish'});
     };
 
+    this.assert_rejected = ((promise) =>
+        promise.then(
+            (val) => {throw new Error(val + " should have failed and it didn't");},
+            (reason) => "success because failed!"
+        )
+    );
 };

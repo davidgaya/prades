@@ -1,38 +1,36 @@
 #!/usr/bin/env node
 'use strict';
 
-var promisify = require('./lib/promisify');
-var request = require('request');
-var log = require('npmlog');
-var unpack = require('tar-pack').unpack;
-var url_signer = require('./lib/url_signer');
+const request = require('request');
+const log = require('npmlog');
+const unpack = require('tar-pack').unpack;
+const url_signer = require('./lib/url_signer');
 const is_platform_enabled = require('./lib/is_platform_enabled');
 log.info("running prades install!");
 
-var package_json = require('./lib/package')(log);
-var options;
+const package_json = require('./lib/package')(log);
 
 // takes a config with host and file_name
 // returns a Promise of the signed url
-var get_signed_source_url = url_signer('GET', log);
+const get_signed_source_url = url_signer('GET', log);
 
 // takes a url
 // returns a Promise of the packed stream
 function get_stream(url) {
     return new Promise(function (fulfill, reject) {
         log.http("GET", url);
-        var r = request(url);
-        r.on('response', (res) => {
+        const packed_stream = request(url);
+        packed_stream.on('response', (res) => {
             log.http(res.statusCode);
             if (res.statusCode >= 200 && res.statusCode < 300) {
-                fulfill(r);
+                fulfill(packed_stream);
             } else {
-                var err = Error("File does not exist. Ask developer to publish binaries for this version.");
+                const err = Error("File does not exist. Ask developer to publish binaries for this version.");
                 log.error("ERROR", err);
                 reject(err);
             }
         });
-        r.on('error', (err) => { reject(err); });
+        packed_stream.on('error', (err) => { reject(err); });
     });
 }
 
@@ -40,27 +38,24 @@ function extract_stream(packed_stream) {
     packed_stream
         .pipe(unpack('.', {keepFiles: true}, function (err) {
             if (err) {
-                log.error(err);
+                throw(err);
             } else {
                 log.info('UNPACK', 'done');
             }
-        })).on('error', (err) => {log.error(err);});
+        })).on('error', (err) => {throw(err);});
 }
 
-module.exports = function (opt) {
-    options = opt;
+module.exports = function (options) {
+
+    const download_and_extract = (config) => get_signed_source_url(config)
+        .then(get_stream)
+        .then(extract_stream);
 
     return package_json
         .then(is_platform_enabled)
-        .then(function (config) {
-            return get_signed_source_url(config)
-                .then(get_stream)
-                .then(extract_stream)
-                .catch((reason) => {
-                    log.error(reason);
-                    throw(Error(reason));
-                });
-        }, function (reason) {
-            log.info("Nothing to do. " + reason);
+        .then(download_and_extract, (reason) => log.info("Nothing to do. " + reason))
+        .catch((reason) => {
+            log.error(reason);
+            throw(Error(reason));
         });
 };
