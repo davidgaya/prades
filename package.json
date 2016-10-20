@@ -9,6 +9,7 @@
   "dependencies": {
     "commander": "2.9.0",
     "fs": "0.0.2",
+    "npm": "^3.8",
     "npmlog": "4.0.0",
     "read-package-json": "^2.0.3",
     "request": "2.75.0",
