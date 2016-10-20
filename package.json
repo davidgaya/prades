@@ -18,7 +18,8 @@
     "xml2js": "^0.4.16"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha",
+    "build": "./node_modules/.bin/mocha"
   },
   "author": "StarbreezeStudios",
   "license": "ISC",
