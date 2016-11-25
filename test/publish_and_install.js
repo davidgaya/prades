@@ -2,6 +2,7 @@
 
 require('./utils')(); /* globals std_package_json, writePackageJson, writeInstallPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
 var assert = require('assert');
+const isWin = /^win/.test(process.platform);
 
 /* this are the fs fixtures
  ├── install
@@ -58,7 +59,9 @@ describe("publish and install", function () {
             assert_exists("./test/install/boost/linked_file.txt");
             assert_exists("./test/install/boost/boost/david_test_2.txt");
             assert_exists("./test/install/boost/stage/david_test.txt");
-            assert_exists("./test/install/boost/linked_dir/linked_file.txt");
+            if (!isWin) { //SymLink directories are not followed by git clone
+                assert_exists("./test/install/boost/linked_dir/linked_file.txt");
+            }
             assert_not_exists("./test/install/boost/dont_pack.this");
         });
     });
@@ -82,11 +85,14 @@ describe("publish and install", function () {
             assert_exists("./test/install/boost");
             assert_exists("./test/install/boost/boost");
             assert_exists("./test/install/boost/stage");
-            assert_exists("./test/install/boost/linked_dir");
+            if (!isWin) { //SymLink directories are not followed by git clone
+                assert_exists("./test/install/boost/linked_dir");
+                assert_exists("./test/install/boost/linked_dir/linked_file.txt");
+            }
             assert_exists("./test/install/boost/linked_file.txt");
             assert_exists("./test/install/boost/boost/david_test_2.txt");
             assert_exists("./test/install/boost/stage/david_test.txt");
-            assert_exists("./test/install/boost/linked_dir/linked_file.txt");
+
             assert_not_exists("./test/install/boost/dont_pack.this");
         });
     });
@@ -134,7 +140,9 @@ describe("publish and install", function () {
             assert_exists("./test/install/boost/linked_file.txt");
             assert_exists("./test/install/boost/boost/david_test_2.txt");
             assert_exists("./test/install/boost/stage/david_test.txt");
-            assert_exists("./test/install/boost/linked_dir/linked_file.txt");
+            if (!isWin) { //SymLink directories are not followed by git clone
+                assert_exists("./test/install/boost/linked_dir/linked_file.txt");
+            }
             assert_exists("./test/install/boost/dont_pack.this");
         });
     });
