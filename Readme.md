@@ -18,7 +18,7 @@ where we specify details about the binary file and location
   "binary": {
     "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
     "path": "bin",
-    "host": "https://registry.starbreeze.com/-/releases"
+    "host": "https://registry-node.starbreeze.com/-/releases"
   }
 ```
 more on package.json's binary format options below.
@@ -99,7 +99,7 @@ example:
  "binary": {
    "file": "{package_name}/{package_version}/{platform}-{arch}.tar.gz",
    "path": "bin",
-   "host": "https://registry.starbreeze.com/-/releases",
+   "host": "https://registry-node.starbreeze.com/-/releases",
    "os": ["win32"],
    "cpu": ["x64"]
  }
