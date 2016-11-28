@@ -6,7 +6,7 @@ There are some solutions to distribute binaries (like node-pre-gyp) but all of t
 In this scenario, AWS S3 is a good solution to distribute private binaries with signed URLs.
 
 Prades rely on the existence of a signing request microservice in the registry server.
-For example https://registry.starbreeze.com has a /-/releases endpoint that signs request
+For example https://registry-node.starbreeze.com has a /-/releases endpoint that signs request
 (if user is authorized) and redirects to this signed S3 url.
 
 ### How to use
@@ -18,7 +18,7 @@ where we specify details about the binary file and location
   "binary": {
     "file": "{package_name}/{package_version}/{node_abi}-{platform}-{arch}.tar.gz",
     "path": "bin",
-    "host": "https://registry.starbreeze.com/-/releases"
+    "host": "https://registry-node.starbreeze.com/-/releases"
   }
 ```
 more on package.json's binary format options below.
@@ -99,7 +99,7 @@ example:
  "binary": {
    "file": "{package_name}/{package_version}/{platform}-{arch}.tar.gz",
    "path": "bin",
-   "host": "https://registry.starbreeze.com/-/releases",
+   "host": "https://registry-node.starbreeze.com/-/releases",
    "os": ["win32"],
    "cpu": ["x64"]
  }
