@@ -34,7 +34,7 @@ function get_binary_list() {
             .then((url) => url + "&prefix=" + config.package_name() + "/"+ config.version() + "&list-type=2")
             .then(get_xml_body)
             .then((xml_body) => xml_parse(xml_body))
-            .then((js_body) => js_body.ListBucketResult.Contents)
+            .then((js_body) => js_body.ListBucketResult.Contents || [])
             .then((contents) =>
                 contents.map(function (el) {
                     return {
@@ -44,8 +44,7 @@ function get_binary_list() {
                         md5: el.ETag[0].replace(/^\"(.*)\"$/, "$1")
                     };
                 })
-            )
-            .then(console.log);
+            );
     }).catch((reason) => {
         log.error(reason);
         throw(Error(reason));
@@ -61,6 +60,14 @@ module.exports = function (opt) {
             log.error("This package is not published.");
             console.log('This package is not published.');
         })
-        .then(get_binary_list);
+        .then(get_binary_list)
+        .then(binary_list => {
+            if (binary_list.length === 0 ) {
+                log.error('No binaries have been published.');
+                console.log("No binaries have been published.");
+            } else {
+                binary_list.forEach(binary_entry => console.log("\n" + JSON.stringify(binary_entry, null, 4)));
+            }
+        });
 
 };
