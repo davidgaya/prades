@@ -49,6 +49,14 @@ When we install a package we don't have to do anything special.
 The install script in the package.json will run the prades install and it 
 will download the binaries and put them in the specified target directory.
 
+```npm install``` has an strange behaviour. There is no way to tell when you
+run npm install to install dependencies to build and publish, or when npm 
+is installing as part of a depencency. When you checkout a git repo and try 
+to build a package you will encounter errors because prades install is run as 
+part of npm install but the binaries packages do not exist yet.
+
+To prevent this catch, prades install will do nothing if there exists a ```.git```
+folder. This behaviour can be disabled using -f (--force) command line option.
 
 ### package.json options
 #### Matching rules for path option
