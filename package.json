@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "commander": "2.9.0",
-    "fs": "0.0.2",
     "grunt": "^1.0.1",
     "ncp": "^2.0.0",
     "npm": "^3.8",

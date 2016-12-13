@@ -6,9 +6,6 @@ const log = require('npmlog');
 const unpack = require('tar-pack').unpack;
 const url_signer = require('./lib/url_signer');
 const is_platform_enabled = require('./lib/is_platform_enabled');
-log.info("running prades install!");
-
-const package_json = require('./lib/package')(log);
 
 // takes a config with host and file_name
 // returns a Promise of the signed url
@@ -45,15 +42,31 @@ function extract_stream(packed_stream) {
         })).on('error', (err) => {throw(err);});
 }
 
+const there_is_a_git_folder = function () {
+    const stat = require('fs').statSync;
+    try {
+        stat('.git');
+        return true;
+    } catch(e) {
+        return false;
+    }
+};
+
 module.exports = function (options) {
 
-    const download_and_extract = (config) => get_signed_source_url(config)
+    const download_and_extract = config => get_signed_source_url(config)
         .then(get_stream)
         .then(extract_stream);
 
+    if (!options.force && there_is_a_git_folder()) {
+        log.info('.git folder present, skipping prades install. Force with -f option.');
+        return Promise.resolve('good');
+    }
+    log.info("running prades install!");
+    const package_json = require('./lib/package')(log);
     return package_json
         .then(is_platform_enabled)
-        .then(download_and_extract, (reason) => log.info("Nothing to do. " + reason))
+        .then(download_and_extract, reason => log.info("Nothing to do. " + reason))
         .catch((reason) => {
             log.error(reason);
             throw(Error(reason));
