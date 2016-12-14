@@ -23,6 +23,7 @@ program
 program
     .command('install')
     .description('download and install binaries')
+    .option('-f, --force', 'Force install')
     .action(install);
 
 program
