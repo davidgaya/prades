@@ -19,11 +19,10 @@ const cache = require('./lib/stream_cache')('tmp'); //ToDo - replace tmp by some
 
 function get_stream(url) {
     const key = get_etag(url); // key is a promise
-    key.then(console.log);
-
     return cache.read(key).then((local_stream) => {
         if (! local_stream) {
-            return cache.write(key, get_remote_stream(url)); //write returns a stream promise
+            //write returns a stream promise
+            return cache.write(key, get_remote_stream(url));
         } else {
             return local_stream;
         }
