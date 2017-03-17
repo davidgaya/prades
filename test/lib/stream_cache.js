@@ -40,7 +40,7 @@ describe('stream cache', function () {
         s._read = () => {};
         s.push(string);
         s.push(null);
-        return s;
+        return Promise.resolve(s);
     }
 
     function stream_to_string(stream) {
