@@ -31,16 +31,17 @@ function get_remote_stream(url) {
     });
 }
 
-const cache = require('./lib/cache')();
+const raw_cache = require('./lib/cache')('./cache');
+const cache = require('./lib/stream_cache')(raw_cache);
 
 function get_stream(url) {
     const key = get_etag(url); // key is a promise
 
-    return cache.read(key).then((value) => {
-        if (! value) {
-            return cache.write(key, get_remote_stream(url)); //write must return a stream promise
+    return cache.read(key).then((local_stream) => {
+        if (! local_stream) {
+            return cache.write(key, get_remote_stream(url)); //write returns a stream promise
         } else {
-            return value;
+            return local_stream;
         }
     });
 }
