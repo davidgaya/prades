@@ -3,7 +3,7 @@ const assert = require('assert');
 const temp = require('temp');
 
 describe('stream cache', function () {
-    const stream_cache = require('../../lib/stream_cache')();
+    const stream_cache = require('../../lib/stream_cache')('tmp');
 
     it("stores values", function () {
         const key = random_key();
