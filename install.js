@@ -9,25 +9,7 @@ const is_platform_enabled = require('./lib/is_platform_enabled');
 // takes a config with host and file_name
 // returns a Promise of the signed url
 const get_signed_source_url = url_signer('GET', log);
-
-// takes a url
-// returns a Promise of the packed stream
-const get_remote_stream = require('./lib/install/get_remote_stream');
-const get_etag = require('./lib/install/get_etag');
-
-const cache = require('./lib/stream_cache')('tmp'); //ToDo - replace tmp by something tight to OS ~/.node/cache
-
-function get_stream(url) {
-    const key = get_etag(url); // key is a promise
-    return cache.read(key).then((local_stream) => {
-        if (! local_stream) {
-            //write returns a stream promise
-            return cache.write(key, get_remote_stream(url));
-        } else {
-            return local_stream;
-        }
-    });
-}
+const get_stream = require('./lib/install/get_stream');
 
 function extract_stream(packed_stream) {
     packed_stream
@@ -50,11 +32,13 @@ const there_is_a_git_folder = function () {
     }
 };
 
-module.exports = function (options) {
-
-    const download_and_extract = config => get_signed_source_url(config)
+const download_and_extract = config => {
+    return get_signed_source_url(config)
         .then(get_stream)
         .then(extract_stream);
+};
+
+module.exports = function (options) {
 
     if (!options.force && there_is_a_git_folder()) {
         log.info('.git folder present, skipping prades install. Force with -f option.');
