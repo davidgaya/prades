@@ -13,7 +13,7 @@ const get_signed_source_url = url_signer('GET', log);
 
 // takes a url
 // returns a Promise of the packed stream
-function get_stream(url) {
+function get_remote_stream(url) {
     return new Promise(function (fulfill, reject) {
         log.http("GET", url);
         const packed_stream = request(url);
@@ -28,6 +28,20 @@ function get_stream(url) {
             }
         });
         packed_stream.on('error', (err) => { reject(err); });
+    });
+}
+
+const cache = require('./lib/cache')();
+
+function get_stream(url) {
+    const key = get_etag(url); // key is a promise
+
+    return cache.read(key).then((value) => {
+        if (! value) {
+            return cache.write(key, get_remote_stream(url)); //write must return a stream promise
+        } else {
+            return value;
+        }
     });
 }
 
