@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-const request = require('request');
 const log = require('npmlog');
 const unpack = require('tar-pack').unpack;
 const url_signer = require('./lib/url_signer');
@@ -13,21 +12,20 @@ const get_signed_source_url = url_signer('GET', log);
 
 // takes a url
 // returns a Promise of the packed stream
+const get_remote_stream = require('./lib/install/get_remote_stream');
+const get_etag = require('./lib/install/get_etag');
+
+const cache = require('./lib/stream_cache')('tmp'); //ToDo - replace tmp by something tight to OS ~/.node/cache
+
 function get_stream(url) {
-    return new Promise(function (fulfill, reject) {
-        log.http("GET", url);
-        const packed_stream = request(url);
-        packed_stream.on('response', (res) => {
-            log.http(res.statusCode);
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-                fulfill(packed_stream);
-            } else {
-                const err = Error("File does not exist. Ask developer to publish binaries for this version.");
-                log.error("ERROR", err);
-                reject(err);
-            }
-        });
-        packed_stream.on('error', (err) => { reject(err); });
+    const key = get_etag(url); // key is a promise
+    return cache.read(key).then((local_stream) => {
+        if (! local_stream) {
+            //write returns a stream promise
+            return cache.write(key, get_remote_stream(url));
+        } else {
+            return local_stream;
+        }
     });
 }
 

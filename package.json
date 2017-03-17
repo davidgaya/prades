@@ -20,7 +20,7 @@
     "xml2js": "^0.4.16"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --recursive --grep DO_NOT_RUN --invert",
+    "test": "./node_modules/.bin/mocha test --recursive --grep DO_NOT_RUN --invert",
     "jenkins": "./node_modules/.bin/mocha  --timeout 10000 --recursive --grep DO_NOT_RUN --invert --reporter mocha-multi --reporter-options spec=-,xunit=reports/xunit.xml",
     "build": "./node_modules/.bin/mocha && ./node_modules/.bin/grunt "
   },
