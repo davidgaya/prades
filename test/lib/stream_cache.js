@@ -13,7 +13,7 @@ describe('stream cache', function () {
         const text = "some value that in fact should be a stream";
         const value = string_to_stream(text);
         return stream_cache.write(key, value).then((file) => {
-            file.closeSync();
+            file.close();
             return stream_cache.read(key).then(stream => stream_to_string(stream)).then((val) => {
                 assert.equal(text, val);
             });
