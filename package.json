@@ -31,7 +31,8 @@
     "marked-terminal": "^1.6.2",
     "mocha": "^3.1.2",
     "mocha-multi": "^0.9.1",
-    "rimraf": "^2.5.2"
+    "rimraf": "^2.5.2",
+    "sinon": "^2.0.0"
   },
   "jshintConfig": {
     "esversion": 6,
