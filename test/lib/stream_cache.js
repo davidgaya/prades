@@ -4,7 +4,7 @@ const promisify = require('../../lib/promisify');
 const rimraf = promisify(require('rimraf'));
 
 describe('stream cache', function () {
-    const stream_cache = require('../../lib/stream_cache')('tmp');
+    const stream_cache = require('../../lib/install/stream_cache')('tmp');
 
     after(() => rimraf('tmp'));
 
