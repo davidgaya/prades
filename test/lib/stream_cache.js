@@ -12,7 +12,8 @@ describe('stream cache', function () {
         const key = random_key();
         const text = "some value that in fact should be a stream";
         const value = string_to_stream(text);
-        return stream_cache.write(key, value).then(() => {
+        return stream_cache.write(key, value).then((file) => {
+            file.closeSync();
             return stream_cache.read(key).then(stream => stream_to_string(stream)).then((val) => {
                 assert.equal(text, val);
             });
@@ -38,6 +39,7 @@ describe('stream cache', function () {
         const value = string_to_stream(text);
         return stream_cache
             .write(key, value)
+            .then(file => file.close())
             .then(() => stream_cache.del(key))
             .then(() => {
                 return stream_cache.read(key).then(val => {
