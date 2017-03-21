@@ -1,15 +1,20 @@
 'use strict';
 const assert = require('assert');
-const temp = require('temp');
+const promisify = require('../../lib/promisify');
+const rimraf = promisify(require('rimraf'));
 
 describe('stream cache', function () {
-    const stream_cache = require('../../lib/stream_cache')();
+    require('fs').mkdirSync('tmp');
+    const stream_cache = require('../../lib/install/stream_cache')('tmp');
+
+    after(() => rimraf('tmp'));
 
     it("stores values", function () {
         const key = random_key();
         const text = "some value that in fact should be a stream";
         const value = string_to_stream(text);
-        return stream_cache.write(key, value).then(() => {
+        return stream_cache.write(key, value).then((file) => {
+            file.close();
             return stream_cache.read(key).then(stream => stream_to_string(stream)).then((val) => {
                 assert.equal(text, val);
             });
@@ -26,6 +31,21 @@ describe('stream cache', function () {
             .then(stream_to_string)
             .then((val) => {
                 assert.equal(text, val);
+            });
+    });
+
+    it("deletes values", function () {
+        const key = random_key();
+        const text = "some extra value";
+        const value = string_to_stream(text);
+        return stream_cache
+            .write(key, value)
+            .then(file => file.close())
+            .then(() => stream_cache.del(key))
+            .then(() => {
+                return stream_cache.read(key).then(val => {
+                    assert.equal(undefined, val);
+                });
             });
     });
 
