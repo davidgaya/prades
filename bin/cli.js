@@ -32,12 +32,14 @@ program
     .option('-v, --verbose', 'Be verbose about what files are included.')
     .option('-d, --debug', 'Do not delete temporal file and directories.')
     .option('-f, --force', 'Force publish')
+    .option('-p, --platform [platform]', 'Force platform')
     .action(publish);
 
 program
     .command('unpublish')
     .description('remove binary package from repo')
     .option('-f, --force', 'Force unpublish')
+    .option('-p, --platform [platform]', 'Force platform')
     .action(unpublish);
 
 program
@@ -51,7 +53,8 @@ if (!program.args.length) {
     help();
 }
 
-function exit_with_error() {
+function exit_with_error(reason) {
+    console.log(reason);
     process.exit(1);
 }
 
