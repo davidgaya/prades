@@ -11,7 +11,7 @@ const is_platform_enabled = require('./lib/is_platform_enabled');
 const benchmark = require('./lib/benchmark');
 log.info("running prades publish!");
 
-var package_json = require('./lib/package')(log);
+var package_json = require('./lib/package');
 
 // takes host and path
 // returns a Promise of the signed url
@@ -44,7 +44,7 @@ function put(url, file_path) {
 }
 
 module.exports = function (options) {
-    var p = package_json;
+    var p = package_json(options, log);
     if (!options.force) {
         p = p.then(is_npm_frozen).then(is_platform_enabled);
     }

@@ -9,7 +9,7 @@ const is_npm_frozen = require('./lib/is_npm_frozen');
 
 log.info("running prades unpublish!");
 
-const package_json = require('./lib/package')(log);
+const package_json = require('./lib/package');
 
 // takes host and path
 // returns a Promise of the signed url
@@ -33,7 +33,7 @@ function del(url) {
 
 module.exports = function (options) {
     options = options || {};
-    var p = package_json;
+    var p = package_json(options, log);
     if (!options.force) {
         p = p.then(is_npm_frozen);
     }
