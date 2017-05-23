@@ -45,7 +45,7 @@ module.exports = function (options) {
         return Promise.resolve('good');
     }
     log.info("running prades install!");
-    const package_json = require('./lib/package')(log);
+    const package_json = require('./lib/package')(options, log);
     return package_json
         .then(is_platform_enabled)
         .then(download_and_extract, reason => log.info("Nothing to do. " + reason))

@@ -5,7 +5,7 @@ var promisify = require('./lib/promisify');
 var request = promisify(require('request'));
 var log = require('npmlog');
 var url_signer = require('./lib/url_signer');
-var package_json = require('./lib/package')(log);
+var package_json = require('./lib/package');
 var get_signed_source_url = url_signer('GET', log);
 var xml_parse = promisify(require('xml2js').parseString);
 
@@ -28,7 +28,7 @@ function get_xml_body(url) {
 }
 
 function get_binary_list() {
-    return package_json.then(function (config) {
+    return package_json(options, log).then(function (config) {
         config.file_name = () => '/';
         return get_signed_source_url(config)
             .then((url) => url + "&prefix=" + config.package_name() + "/"+ config.version() + "&list-type=2")
