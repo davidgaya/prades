@@ -8,9 +8,9 @@ var assert = require('assert');
 
 module.exports = function () {
 
-    this.std_package_json = () => ({
+    this.std_package_json = patch_version => ({
         "name": "@sb/prades_test_1",
-        "version": "0.0.01",
+        "version": "0.0." + (patch_version ? patch_version : '01'),
         "dependencies": {
             "@sb/prades": "file:../.."
         },
