@@ -24,11 +24,11 @@ module.exports = function () {
         "license": "ISC", "repository": "."
     });
 
-    this.writePackageJson = function writePackageJson(conf) {
+    this.writePublishPackageJson = function writePublishPackageJson(conf) {
         return writeFile("./test/publish/package.json", JSON.stringify(conf));
     };
 
-    this.writeInstallPackageJson = function writePackageJson(conf) {
+    this.writeInstallPackageJson = function writeInstallPackageJson(conf) {
         return writeFile("./test/install/package.json", JSON.stringify(conf));
     };
 
