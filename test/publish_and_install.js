@@ -1,8 +1,9 @@
 'use strict';
 
-require('./utils')(); /* globals std_package_json, writePackageJson, writeInstallPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
-var assert = require('assert');
+require('./utils')(); /* globals std_package_json, writePublishPackageJson, writeInstallPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
+const assert = require('assert');
 const isWin = /^win/.test(process.platform);
+const crypto = require('crypto');
 
 /* this are the fs fixtures
  ├── install
@@ -28,25 +29,19 @@ const isWin = /^win/.test(process.platform);
 
 describe("publish and install", function () {
     this.timeout(process.env.TIMEOUT || 8000);
-
-    before(() =>
-        writePackageJson(std_package_json()).then(npm_unpublish)
-    );
-
-    before(() =>
-        writeInstallPackageJson(std_package_json())
-    );
+    var packageJson = std_package_json();
 
     beforeEach( clean_install_dir );
 
     it("first example", function () {
-        var packageJson = std_package_json();
+        packageJson.version = "0.0." + crypto.randomBytes(4).readUInt32LE();
         packageJson.binary.path = [
             "boost/**",
             "extra_readme.md",
             "!boost/dont_pack.this"
         ];
-        return writePackageJson(packageJson)
+        return writePublishPackageJson(packageJson)
+        .then(() => writeInstallPackageJson(packageJson))
         .then(publish)
         .then(install)
         .then(function () {
@@ -63,11 +58,12 @@ describe("publish and install", function () {
                 assert_exists("./test/install/boost/linked_dir/linked_file.txt");
             }
             assert_not_exists("./test/install/boost/dont_pack.this");
-        });
+        })
+        .then(unpublish);
     });
 
     it("second example", function () {
-        var packageJson = std_package_json();
+        packageJson.version = "0.0." + crypto.randomBytes(4).readUInt32LE();
         packageJson.binary.path = [
             "boost",
             "boost/linked_file.txt",
@@ -76,7 +72,8 @@ describe("publish and install", function () {
             "boost/boost/**",
             "boost/stage/**"
         ];
-        return writePackageJson(packageJson)
+        return writePublishPackageJson(packageJson)
+        .then(() => writeInstallPackageJson(packageJson))
         .then(publish)
         .then(install)
         .then(function () {
@@ -94,17 +91,19 @@ describe("publish and install", function () {
             assert_exists("./test/install/boost/stage/david_test.txt");
 
             assert_not_exists("./test/install/boost/dont_pack.this");
-        });
+        })
+        .then(unpublish);
     });
 
     it("third example", function () {
-        var packageJson = std_package_json();
+        packageJson.version = "0.0." + crypto.randomBytes(4).readUInt32LE();
         packageJson.binary.path = [
             "boost",
             "boost/boost/**",
             "boost/stage/**"
         ];
-        return writePackageJson(packageJson)
+        return writePublishPackageJson(packageJson)
+        .then(() => writeInstallPackageJson(packageJson))
         .then(publish)
         .then(install)
         .then(function () {
@@ -119,15 +118,17 @@ describe("publish and install", function () {
             assert_exists("./test/install/boost/stage/david_test.txt");
             assert_not_exists("./test/install/boost/linked_dir/linked_file.txt");
             assert_not_exists("./test/install/boost/dont_pack.this");
-        });
+        })
+        .then(unpublish);
     });
 
     it("fourth example", function () {
-        var packageJson = std_package_json();
+        packageJson.version = "0.0." + crypto.randomBytes(4).readUInt32LE();
         packageJson.binary.path = [
             "boost/**"
         ];
-        return writePackageJson(packageJson)
+        return writePublishPackageJson(packageJson)
+        .then(() => writeInstallPackageJson(packageJson))
         .then(publish)
         .then(install)
         .then(function () {
@@ -144,13 +145,15 @@ describe("publish and install", function () {
                 assert_exists("./test/install/boost/linked_dir/linked_file.txt");
             }
             assert_exists("./test/install/boost/dont_pack.this");
-        });
+        })
+        .then(unpublish);
     });
 
     it("fifth example, no binary section in package.json", function (done) {
-        var packageJson = std_package_json();
+        packageJson.version = "0.0." + crypto.randomBytes(4).readUInt32LE();
         delete packageJson.binary;
-        writePackageJson(packageJson)
+        writePublishPackageJson(packageJson)
+        .then(() => writeInstallPackageJson(packageJson))
         .then(publish)
         .then(function resolve() {
             done("Should have failed and it didn't.");
@@ -160,11 +163,12 @@ describe("publish and install", function () {
                 "Should give a clear message that binary section is missing"
             );
             done();
-        }).catch(console.log);
+        }).catch(console.log)
+        .then(unpublish);
     });
 
     it("unpublish example", () =>
-        writePackageJson(std_package_json()).then(unpublish)
+        writePublishPackageJson(std_package_json()).then(unpublish)
     );
 
 });

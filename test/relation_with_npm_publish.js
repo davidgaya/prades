@@ -1,12 +1,12 @@
 'use strict';
 
-require('./utils')(); /* globals std_package_json, writePackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists, assert_rejected */
+require('./utils')(); /* globals std_package_json, writePublishPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists, assert_rejected */
 
 describe("relation with npm publish", function () {
     this.timeout(process.env.TIMEOUT || 8000);
 
     before(() =>
-      writePackageJson(std_package_json())
+      writePublishPackageJson(std_package_json())
     );
 
     describe("npm package is not published", function () {

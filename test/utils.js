@@ -8,9 +8,9 @@ var assert = require('assert');
 
 module.exports = function () {
 
-    this.std_package_json = () => ({
+    this.std_package_json = patch_version => ({
         "name": "@sb/prades_test_1",
-        "version": "0.0.01",
+        "version": "0.0." + (patch_version ? patch_version : '01'),
         "dependencies": {
             "@sb/prades": "file:../.."
         },
@@ -24,11 +24,11 @@ module.exports = function () {
         "license": "ISC", "repository": "."
     });
 
-    this.writePackageJson = function writePackageJson(conf) {
+    this.writePublishPackageJson = function writePublishPackageJson(conf) {
         return writeFile("./test/publish/package.json", JSON.stringify(conf));
     };
 
-    this.writeInstallPackageJson = function writePackageJson(conf) {
+    this.writeInstallPackageJson = function writeInstallPackageJson(conf) {
         return writeFile("./test/install/package.json", JSON.stringify(conf));
     };
 

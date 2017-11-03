@@ -1,13 +1,13 @@
 'use strict';
 
-require('./utils')(); /* globals std_package_json, writePackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists, show_info */
+require('./utils')(); /* globals std_package_json, writePublishPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists, show_info */
 var assert = require('assert');
 
 describe("prades force platform", function () {
     this.timeout(process.env.TIMEOUT || 8000);
 
     before(() =>
-      writePackageJson(std_package_json()).then(npm_unpublish).then(unpublish)
+      writePublishPackageJson(std_package_json()).then(npm_unpublish).then(unpublish)
     );
 
     describe("prades publish for a any platform", function () {
