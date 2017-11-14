@@ -13,7 +13,11 @@ describe("prades force platform", function () {
     describe("prades publish for a any platform", function () {
 
         before(() =>
-            publish('--force martian')
+            publish('--platform martian')
+        );
+
+        after(() =>
+            unpublish('--platform martian')
         );
 
         it("shows prades info", () =>
