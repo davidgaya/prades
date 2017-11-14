@@ -1,5 +1,5 @@
 {
-  "name": "@sb/prades",
+  "name": "prades",
   "version": "0.4.2",
   "description": "Tool to embed large binary objects in npm packages",
   "main": "index.js",
@@ -26,7 +26,7 @@
     "build": "./node_modules/.bin/mocha && ./node_modules/.bin/grunt "
   },
   "author": "StarbreezeStudios",
-  "license": "ISC",
+  "license": "GPL-3.0+",
   "devDependencies": {
     "marked": "^0.3.6",
     "marked-terminal": "^1.6.2",
