@@ -26,7 +26,7 @@
     "build": "./node_modules/.bin/mocha && ./node_modules/.bin/grunt "
   },
   "author": "StarbreezeStudios",
-  "license": "GPL-3.0+",
+  "license": "MIT",
   "devDependencies": {
     "marked": "^0.3.6",
     "marked-terminal": "^1.6.2",
