@@ -28,7 +28,7 @@ function put(url, file_path) {
             'content-type': 'application/octet-stream',
             'content-length': fs.statSync(file_path).size
         };
-        var req = request.put({uri: url, headers: headers});
+        var req = request.put({uri: url, headers: headers, followAllRedirects: true});
         req.on('error', (err) => reject(err));
         req.on('response', function (res) {
             if (res.statusCode >= 200 && res.statusCode < 300) {
