@@ -24,6 +24,7 @@ program
     .command('install')
     .description('download and install binaries')
     .option('-f, --force', 'Force install')
+    .option('-u, --uid', 'Unique Id')
     .action(install);
 
 program
@@ -32,6 +33,7 @@ program
     .option('-v, --verbose', 'Be verbose about what files are included.')
     .option('-d, --debug', 'Do not delete temporal file and directories.')
     .option('-f, --force', 'Force publish')
+    .option('-u, --uid', 'Unique Id')
     .option('-p, --platform [platform]', 'Force platform')
     .action(publish);
 
@@ -39,6 +41,7 @@ program
     .command('unpublish')
     .description('remove binary package from repo')
     .option('-f, --force', 'Force unpublish')
+    .option('-u, --uid', 'Unique Id')
     .option('-p, --platform [platform]', 'Force platform')
     .action(unpublish);
 
