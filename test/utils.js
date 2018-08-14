@@ -1,10 +1,11 @@
 /* jshint strict: false */
 
-var promisify = require('../lib/promisify');
-var exec = promisify(require('child_process').exec);
-var fs = require('fs');
-var writeFile = promisify(fs.writeFile);
-var assert = require('assert');
+const promisify = require('../lib/promisify');
+const exec = require('child_process').exec;
+const exec_promise = promisify(exec);
+const fs = require('fs');
+const writeFile = promisify(fs.writeFile);
+const assert = require('assert');
 
 module.exports = function () {
 
@@ -34,24 +35,29 @@ module.exports = function () {
 
     this.publish = function publish(opt) {
         opt = opt || '';
-        return exec("node ../../bin/cli.js publish " + opt, {cwd: 'test/publish'}).then(() => {});
+        return exec_promise("node ../../bin/cli.js publish " + opt, {cwd: 'test/publish'}).then(() => {});
     };
 
     this.unpublish = function unpublish(opt) {
         opt = opt || '';
-        return exec("node ../../bin/cli.js unpublish " + opt, {cwd: 'test/publish'}).then(() => {});
+        return exec_promise("node ../../bin/cli.js unpublish " + opt, {cwd: 'test/publish'}).then(() => {});
+    };
+
+    this.size = function size(opt) {
+        opt = opt || '';
+        return exec("node ../../bin/cli.js size " + opt, {cwd: 'test/publish'});
     };
 
     this.npm_publish = function npm_publish() {
-        return exec("npm publish", {cwd: 'test/publish'}).then(() => {})
+        return exec_promise("npm publish", {cwd: 'test/publish'}).then(() => {})
     };
 
     this.npm_unpublish = function npm_unpublish() {
-        return exec("npm unpublish -f", {cwd: 'test/publish'}).then(() => {});
+        return exec_promise("npm unpublish -f", {cwd: 'test/publish'}).then(() => {});
     };
 
     this.install = function install() {
-        return exec("node ../../bin/cli.js install", {cwd: 'test/install'});
+        return exec_promise("node ../../bin/cli.js install", {cwd: 'test/install'});
     };
 
     this.clean_install_dir = function clean_install_dir() {
@@ -71,7 +77,7 @@ module.exports = function () {
 
     this.show_info = function show_info(opt) {
         opt = opt || '';
-        return exec("node ../../bin/cli.js info " + opt, {cwd: 'test/publish'});
+        return exec_promise("node ../../bin/cli.js info " + opt, {cwd: 'test/publish'});
     };
 
     this.assert_rejected = ((promise) =>
