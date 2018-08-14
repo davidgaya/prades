@@ -5,9 +5,7 @@
  */
 
 'use strict';
-require('./utils')(); /* globals std_package_json, writePublishPackageJson, writeInstallPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists, assert_rejected */
-
-const assert = require('assert');
+require('./utils')(); /* globals std_package_json, writePublishPackageJson, writeInstallPackageJson, publish, unpublish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists, assert_rejected */
 
 describe('os and cpu options', function () {
     this.timeout(process.env.TIMEOUT || 8000);

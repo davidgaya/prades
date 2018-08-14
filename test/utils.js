@@ -43,7 +43,7 @@ module.exports = function () {
     };
 
     this.npm_publish = function npm_publish() {
-        return exec("npm publish", {cwd: 'test/publish'}).then(() => {});
+        return exec("npm publish", {cwd: 'test/publish'}).then(() => {})
     };
 
     this.npm_unpublish = function npm_unpublish() {
@@ -77,7 +77,7 @@ module.exports = function () {
     this.assert_rejected = ((promise) =>
         promise.then(
             (val) => {throw new Error(val + " should have failed and it didn't");},
-            (reason) => "success because failed!"
+            () => "success because failed!"
         )
     );
 };

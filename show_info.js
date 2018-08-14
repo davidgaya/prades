@@ -41,13 +41,13 @@ function get_binary_list() {
                         file: el.Key[0],
                         last_modified: el.LastModified[0],
                         size: parseInt(el.Size[0], 10),
-                        md5: el.ETag[0].replace(/^\"(.*)\"$/, "$1")
+                        md5: el.ETag[0].replace(/^"(.*)"$/, "$1")
                     };
                 })
             );
     }).catch((reason) => {
         log.error(reason);
-        throw(Error(reason));
+        throw(reason);
     });
 }
 
@@ -56,7 +56,7 @@ module.exports = function (opt) {
 
     return load()
         .then(()=>view())
-        .catch((reason) => {
+        .catch(() => {
             log.error("This package is not published.");
             console.log('This package is not published.');
         })
