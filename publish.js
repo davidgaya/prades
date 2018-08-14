@@ -23,6 +23,7 @@ var get_packed_file_path = require('./lib/publish/get_packed_file_path');
 
 function put(url, file_path) {
     var promise = new Promise(function (fulfill, reject) {
+        log.info('uploading', url, file_path);
         log.http("PUT", url);
         var headers = {
             'content-type': 'application/octet-stream',
@@ -52,7 +53,7 @@ module.exports = function (options) {
         Promise.all([
             get_signed_target_url(config),
             get_packed_file_path(config.path(), options, log)
-        ]).then((results) => put(results[0], results[1]))
+        ]).then(results => put(results[0], results[1]))
     )
     .catch((reason) => {
         log.error(reason);

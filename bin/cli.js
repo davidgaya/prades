@@ -46,6 +46,12 @@ program
     .action(unpublish);
 
 program
+    .command('size')
+    .description('retrieve package size')
+    .option('-v, --verbose', 'Be verbose about what files are included.')
+    .action(size);
+
+program
     .command('info')
     .description('show package publish status (both npm and prades binaries)')
     .action(show_info);
@@ -71,6 +77,10 @@ function publish(options) {
 
 function unpublish(options) {
     return require('../unpublish')(options).catch(exit_with_error);
+}
+
+function size(options) {
+    return require('../size')(options).catch(exit_with_error);
 }
 
 function show_info(options) {
