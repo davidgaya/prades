@@ -12,7 +12,7 @@ log.info("running prades size!");
 
 // takes an array of paths to pack
 // returns package size
-const get_package_size = require('./lib/publish/copy_dir');
+const get_package_size = require('./lib/publish/size_dir');
 
 const validate_npm = config => is_npm_frozen(config)
     .then(is_platform_enabled)
@@ -21,7 +21,7 @@ const validate_npm = config => is_npm_frozen(config)
 module.exports = options => package_json(options, log)
     .then(config => options.force ? Promise.resolve(config) : validate_npm(config))
     .then(config => get_package_size(config.path(), options, log))
-    .then(({ size }) => {
+    .then(size => {
         log.info(`size=${size}`);
         return size;
     })
