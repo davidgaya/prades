@@ -2,7 +2,6 @@
 'use strict';
 
 const request = require('request');
-const fs = require('fs');
 const log = require('npmlog');
 const url_signer = require('./lib/url_signer');
 const is_npm_frozen = require('./lib/is_npm_frozen');

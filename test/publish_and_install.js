@@ -1,30 +1,30 @@
 'use strict';
 
-require('./utils')(); /* globals std_package_json, writePublishPackageJson, writeInstallPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
+require('./utils')(); /* globals std_package_json, writePublishPackageJson, writeInstallPackageJson, publish, unpublish, install, clean_install_dir, assert_exists, assert_not_exists */
 const assert = require('assert');
 const isWin = /^win/.test(process.platform);
 const crypto = require('crypto');
 
 /* this are the fs fixtures
  ├── install
- │   └── package.json
+ │   └── package.json
  ├── linked_lib
- │   ├── linked_dir
- │   │   └── linked_file.txt
- │   └── linked_file.txt
+ │   ├── linked_dir
+ │   │   └── linked_file.txt
+ │   └── linked_file.txt
  └── publish
-     ├── boost
-     │   ├── boost
-     │   │   └── david_test_2.txt
-     │   ├── dont_pack.this
-     │   ├── linked_dir -> ../../linked_lib/linked_dir
-     │   ├── linked_file.txt -> ../../linked_lib/linked_file.txt
-     │   └── stage
-     │       └── david_test.txt
-     ├── extra_readme.md
-     ├── index.js
-     ├── package.json
-     └── Readme.md
+    ├── boost
+    │   ├── boost
+    │   │   └── david_test_2.txt
+    │   ├── dont_pack.this
+    │   ├── linked_dir -> ../../linked_lib/linked_dir
+    │  ├── linked_file.txt -> ../../linked_lib/linked_file.txt
+    │   └── stage
+    │       └── david_test.txt
+    ├── extra_readme.md
+    ├── index.js
+    ├── package.json
+    └── Readme.md
 */
 
 describe("publish and install", function () {

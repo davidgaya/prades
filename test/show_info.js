@@ -1,6 +1,6 @@
 'use strict';
 
-require('./utils')(); /* globals std_package_json, writePublishPackageJson, publish, unpublish, npm_publish, npm_unpublish, install, clean_install_dir, assert_exists, assert_not_exists, show_info */
+require('./utils')(); /* globals std_package_json, writePublishPackageJson, publish, unpublish, npm_publish, npm_unpublish, show_info */
 var assert = require('assert');
 
 describe("prades info", function () {
@@ -24,7 +24,7 @@ describe("prades info", function () {
         after( npm_unpublish );
         it("shows npm info", () =>
             show_info().then(function (output) {
-                assert.ok(/\@sb\/prades_test_1/.test(output));
+                assert.ok(/@sb\/prades_test_1/.test(output));
                 assert.ok(/0\.0\.1/.test(output));
             })
         );
@@ -38,7 +38,7 @@ describe("prades info", function () {
 
         it("shows prades info", () =>
             show_info().then(function (output) {
-                var regExp = new RegExp("\-" + process.platform + "\-" + process.arch + "\.tar\.gz");
+                var regExp = new RegExp("-" + process.platform + "-" + process.arch + ".tar.gz");
                 assert.ok(regExp.test(output), "binary does not exist");
                 assert.ok(/0\.0\.1/.test(output), "version does not exist");
             })
