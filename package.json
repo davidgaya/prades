@@ -1,6 +1,6 @@
 {
   "name": "prades",
-  "version": "0.4.4",
+  "version": "0.4.6",
   "description": "Tool to embed large binary objects in npm packages",
   "main": "index.js",
   "bin": {
